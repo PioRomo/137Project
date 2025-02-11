@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.pixelpedia
 
 import androidx.appcompat.app.AppCompatActivity
 import android.annotation.SuppressLint
@@ -11,7 +11,7 @@ import android.view.View
 import android.view.WindowInsets
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.example.myapplication.databinding.ActivityFullscreenBinding
+import com.example.pixelpedia.databinding.ActivityFullscreenBinding
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
