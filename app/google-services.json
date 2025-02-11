@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "835283165703",
+    "project_id": "pixelpedia-eefc3",
+    "storage_bucket": "pixelpedia-eefc3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835283165703:android:515658b5a5942218c600a2",
+        "android_client_info": {
+          "package_name": "com.example.pixelpedia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUSy6VCz0C-6fZog4GF8c3qRQCYL63ojk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
