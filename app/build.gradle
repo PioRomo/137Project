@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace 'com.example.myapplication'
-    compileSdk 33
+    namespace 'com.example.pixelpedia'
+    compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.myapplication"
+        applicationId "com.example.pixelpedia"
         minSdk 21
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
