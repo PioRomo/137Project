@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/PrimaryPurple"
-        tools:layout_editor_absoluteX="-107dp"
-        tools:layout_editor_absoluteY="-16dp">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-300dp">
 
         <ImageView
             android:id="@+id/imageView2"
@@ -26,6 +26,21 @@
             android:layout_marginTop="33dp"
             android:layout_marginEnd="3dp"
             app:srcCompat="@drawable/pixelpedialogowordmark" />
+
+        <ImageView
+            android:id="@+id/togglePasswordVisibility"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_below="@+id/imageView2"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="326dp"
+            android:layout_marginTop="313dp"
+            android:layout_marginEnd="45dp"
+            android:layout_marginBottom="229dp"
+            android:onClick="togglePasswordVisibility"
+            android:src="@drawable/ic_visibility" />
     </RelativeLayout>
 
     <TextView
@@ -108,6 +123,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
+        android:fontFamily="sans-serif"
         android:hint="Enter password"
         android:inputType="text"
         android:textSize="20sp"
@@ -120,8 +136,8 @@
 
     <Button
         android:id="@+id/registerRegisterButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="121dp"
+        android:layout_height="62dp"
         android:background="@color/PrimaryMagenta"
         android:fontFamily="sans-serif-black"
         android:text="Register"
@@ -136,7 +152,7 @@
     <Button
         android:id="@+id/registerBackToLogin"
         android:layout_width="385dp"
-        android:layout_height="45dp"
+        android:layout_height="50dp"
         android:background="@android:color/transparent"
         android:fontFamily="sans-serif-medium"
         android:text="Take me back to the login page!"

@@ -27,7 +27,7 @@
 
 
     <EditText
-        android:id="@+id/loginUsernameText"
+        android:id="@+id/loginEmailText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -39,15 +39,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginUsernameTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/loginEmailTitle" />
 
     <TextView
-        android:id="@+id/loginUsernameTitle"
+        android:id="@+id/loginEmailTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
         android:fontFamily="sans-serif-black"
-        android:text="Username"
+        android:text="Email"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
