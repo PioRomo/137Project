@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="PrimaryPurple">#20124d</color>
+    <color name="Salmon">#fa5b6b</color>
+    <color name="PrimaryPurple">#25212b</color>
     <color name="PrimaryMagenta">#C12AAD</color>
     <color name="purple_200">#FF8489AE</color>
     <color name="purple_500">#FF6200EE</color>
