@@ -38,7 +38,7 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.loginLoginButton)
         registerButton = findViewById(R.id.loginRegisterButton)
 
-        //Initizalize Biometric button
+        //Initialize Biometric button
         biometricLoginButton = findViewById(R.id.biometricLoginButton)
         // Biometric login button logic
         biometricLoginButton.setOnClickListener {
@@ -58,7 +58,7 @@ class LoginActivity : AppCompatActivity() {
                        val user = auth.currentUser
                        if (user?.isEmailVerified == true) {
                            Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                           startActivity(Intent(this, DummyActivity::class.java))
+                           startActivity(Intent(this, MainActivity::class.java))
                            finish()
                        } else {
                            Toast.makeText(this, "Please verify your email before logging in.", Toast.LENGTH_LONG).show()
