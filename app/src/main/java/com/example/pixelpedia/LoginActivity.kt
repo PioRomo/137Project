@@ -33,9 +33,9 @@ class LoginActivity : AppCompatActivity() {
         auth.signOut()
 
         //Initialize our views here
-        emailEditText = findViewById(R.id.loginEmailText)
+        emailEditText = findViewById(R.id.changeUsernameText)
         passwordEditText = findViewById(R.id.loginPasswordText)
-        loginButton = findViewById(R.id.loginLoginButton)
+        loginButton = findViewById(R.id.changeUsernameSubmit)
         registerButton = findViewById(R.id.loginRegisterButton)
 
         //Initialize Biometric button
