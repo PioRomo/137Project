@@ -4,4 +4,6 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_dummy">DummyActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_change_username">ChangeUsernameActivity</string>
 </resources>

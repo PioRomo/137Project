@@ -15,12 +15,23 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
+            android:name=".ChangeUsernameActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:label="@string/title_activity_change_username"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name=".SettingsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
             android:name=".DummyActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:label="@string/title_activity_dummy"
-            android:theme="@style/Theme.MyApplication.Fullscreen" />
-        <!-- Other activities -->
+            android:theme="@style/Theme.MyApplication.Fullscreen" /> <!-- Other activities -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false"

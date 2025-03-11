@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/PrimaryPurple"
+    tools:context=".MainActivity">
+
+    <!-- Top Bar with Logo and Settings Icon -->
+    <RelativeLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/PrimaryPurple"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginBottom="9dp"
+            android:src="@drawable/pixelpedialogo" />
+
+        <ImageView
+            android:id="@+id/leftChevron"
+            android:layout_width="65dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            app:srcCompat="@drawable/baseline_chevron_left_24" />
+
+    </RelativeLayout>
+
+    <!-- Search Bar -->
+
+    <!-- Weekly Top Profiles Section -->
+
+    <!-- User Profile Containers -->
+    <LinearLayout
+        android:id="@+id/userProfilesContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/PrimaryPurple"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Bottom Navigation Bar -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/PrimaryPurple"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
+
+    <Button
+        android:id="@+id/set_up_biometrics"
+        android:layout_width="312dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="80dp"
+        android:background="@color/PrimaryMagenta"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Configure Biometric Login"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBar" />
+
+    <Button
+        android:id="@+id/change_username"
+        android:layout_width="312dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="44dp"
+        android:background="@color/PrimaryMagenta"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Change Username"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/set_up_biometrics" />
+
+    <Button
+        android:id="@+id/change_location"
+        android:layout_width="312dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="44dp"
+        android:background="@color/PrimaryMagenta"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Change/Set Location"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/change_username" />
+
+    <Button
+        android:id="@+id/log_out_button"
+        android:layout_width="312dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="152dp"
+        android:background="@color/Salmon"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Log Out"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/change_location" />
+
+    <Button
+        android:id="@+id/delete_account"
+        android:layout_width="312dp"
+        android:layout_height="45dp"
+        android:background="@color/Salmon"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Delete Account "
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/log_out_button" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
