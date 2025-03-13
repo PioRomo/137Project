@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
                        val user = auth.currentUser
                        if (user?.isEmailVerified == true) {
                            Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                           startActivity(Intent(this, DummyActivity::class.java))
+                           startActivity(Intent(this, DummyActivity::class.java)) //page redirect
                            finish()
                        } else {
                            Toast.makeText(this, "Please verify your email before logging in.", Toast.LENGTH_LONG).show()
