@@ -2,6 +2,7 @@ package com.example.pixelpedia
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -18,8 +19,10 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
     private lateinit var registerButton: Button
+
     //Biometric button instance
     private lateinit var biometricLoginButton: Button
+
     //Firebase Auth instance
     private lateinit var auth: FirebaseAuth
 
@@ -46,39 +49,51 @@ class LoginActivity : AppCompatActivity() {
         }
 
         //Handling Login logic
-        loginButton.setOnClickListener{
+        loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
 
-            if (email.isNotEmpty() && password.isNotEmpty()){
-               auth.signInWithEmailAndPassword(email, password).addOnCompleteListener{
-                   task ->
-                   if(task.isSuccessful()){
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful()) {
                         //Login is valid,  redirect to home page
-                       val user = auth.currentUser
-                       if (user?.isEmailVerified == true) {
-                           Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                           startActivity(Intent(this, MainActivity::class.java))
-                           finish()
-                       } else {
-                           Toast.makeText(this, "Please verify your email before logging in.", Toast.LENGTH_LONG).show()
-                           auth.signOut()
-                       }
-                   }
-                   else{
-                       //Invalid Login, retry
-                       Toast.makeText(this, "Login Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                   }
-               }
+                        val user = FirebaseAuth.getInstance().currentUser
+                        if (user?.isEmailVerified == true) {
+                            val sharedPreferences = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
+                            sharedPreferences.edit().putString("user_email", user.email).apply()
 
-            } else{
+
+
+                            Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(
+                                this,
+                                "Please verify your email before logging in.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            auth.signOut()
+                        }
+                    } else {
+                        //Invalid Login, retry
+                        Toast.makeText(
+                            this,
+                            "Login Failed: ${task.exception?.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+            } else {
                 //Password and/or email not entered, try again
-                Toast.makeText(this, "Please enter your email and password", Toast .LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter your email and password", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
         //Set logic for signing up here
-        registerButton.setOnClickListener{
+        registerButton.setOnClickListener {
             //Open the register activity(screen)
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -86,11 +101,17 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    override fun onStart(){
+    override fun onStart() {
         super.onStart()
-        if(auth.currentUser != null){
-            startActivity(Intent(this, DummyActivity::class.java))
+        // Check if a user is already logged in
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            // User is already logged in, navigate to MainActivity
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
+        } else {
+            // If user is not logged in, show biometric prompt or login page
+            showBiometricPrompt()
         }
     }
 
@@ -102,18 +123,35 @@ class LoginActivity : AppCompatActivity() {
         val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
-                // Authentication succeeded, login the user
-                Toast.makeText(applicationContext, "Biometric Authentication Succeeded", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this@LoginActivity, DummyActivity::class.java))
-                finish()
+
+                // Authentication succeeded, now retrieve the stored email
+                val sharedPreferences = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
+                val userEmail = sharedPreferences.getString("user_email", null)
+
+                if (userEmail != null) {
+                    // Now sign in with the stored email
+                    FirebaseAuth.getInstance().signInWithEmailAndPassword(userEmail, "Bayarea5511884$")
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                // Login is successful, proceed to the main screen
+                                Toast.makeText(applicationContext, "Biometric Authentication Succeeded", Toast.LENGTH_SHORT).show()
+                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                                finish()
+                            } else {
+                                // If the login fails
+                                Toast.makeText(applicationContext, "Authentication Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                } else {
+                    // If no email is found, show an error
+                    Toast.makeText(applicationContext, "No user found for biometric login", Toast.LENGTH_SHORT).show()
+                }
             }
 
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
                 // If authentication fails, prompt the user to enter credentials manually
                 Toast.makeText(applicationContext, "Biometric Authentication Failed", Toast.LENGTH_SHORT).show()
-                // No UI changes needed, just allow them to input credentials manually
-                // You can also show a message or update UI if desired
             }
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
@@ -130,4 +168,7 @@ class LoginActivity : AppCompatActivity() {
 
         biometricPrompt.authenticate(promptInfo)
     }
+
+
+
 }
