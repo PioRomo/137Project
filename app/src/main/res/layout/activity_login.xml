@@ -16,7 +16,7 @@
         tools:layout_editor_absoluteY="-16dp">
 
         <Button
-            android:id="@+id/biometricLoginButton"
+            android:id="@+id/resetPasswordButton"
             android:layout_width="271dp"
             android:layout_height="48dp"
             android:layout_above="@+id/loginRegisterButton"
@@ -29,14 +29,14 @@
             android:layout_marginBottom="11dp"
             android:background="@android:color/transparent"
             android:fontFamily="@font/poppins_bold"
-            android:text="Login With Biometrics"
+            android:text="Reset Password"
             android:textAllCaps="false" />
 
         <Button
             android:id="@+id/changeUsernameSubmit"
             android:layout_width="237dp"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/biometricLoginButton"
+            android:layout_above="@+id/resetPasswordButton"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_centerHorizontal="true"

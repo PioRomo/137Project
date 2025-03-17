@@ -76,20 +76,6 @@
         app:menu="@menu/bottom_nav_menu" />
 
     <Button
-        android:id="@+id/set_up_biometrics"
-        android:layout_width="312dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="80dp"
-        android:background="@color/PrimaryMagenta"
-        android:fontFamily="@font/poppins_bold"
-        android:text="Configure Biometric Login"
-        android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topBar" />
-
-    <Button
         android:id="@+id/change_username"
         android:layout_width="312dp"
         android:layout_height="45dp"
@@ -101,7 +87,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/set_up_biometrics" />
+        app:layout_constraintTop_toBottomOf="@+id/biometric_switch" />
 
     <Button
         android:id="@+id/change_location"
@@ -144,5 +130,17 @@
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/log_out_button" />
+
+    <Switch
+        android:id="@+id/biometric_switch"
+        android:layout_width="312dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="44dp"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Enable Biometric Login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

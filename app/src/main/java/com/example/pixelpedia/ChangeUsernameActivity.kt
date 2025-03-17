@@ -93,6 +93,8 @@ class ChangeUsernameActivity : AppCompatActivity() {
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
+        } else {
+            Toast.makeText(this, "Please log in first", Toast.LENGTH_SHORT).show()
         }
     }
 }
