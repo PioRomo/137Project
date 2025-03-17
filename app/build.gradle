@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.pixelpedia"
-        minSdk 21
+        minSdk 23
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -54,6 +54,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.google.firebase:firebase-dynamic-links:21.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

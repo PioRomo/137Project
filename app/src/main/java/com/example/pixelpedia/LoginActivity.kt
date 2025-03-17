@@ -1,8 +1,8 @@
 package com.example.pixelpedia
 
+
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -13,6 +13,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import java.util.concurrent.Executor
 
+
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var emailEditText: EditText;
@@ -20,8 +21,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginButton: Button
     private lateinit var registerButton: Button
 
-    //Biometric button instance
-    private lateinit var biometricLoginButton: Button
 
     //Firebase Auth instance
     private lateinit var auth: FirebaseAuth
@@ -41,12 +40,6 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.changeUsernameSubmit)
         registerButton = findViewById(R.id.loginRegisterButton)
 
-        //Initialize Biometric button
-        biometricLoginButton = findViewById(R.id.biometricLoginButton)
-        // Biometric login button logic
-        biometricLoginButton.setOnClickListener {
-            showBiometricPrompt()
-        }
 
         //Handling Login logic
         loginButton.setOnClickListener {
@@ -61,12 +54,7 @@ class LoginActivity : AppCompatActivity() {
                         if (user?.isEmailVerified == true) {
                             val sharedPreferences = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
                             sharedPreferences.edit().putString("user_email", user.email).apply()
-
-
-
-                            Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this, MainActivity::class.java))
-                            finish()
+                            promptBiometricLogin()
                         } else {
                             Toast.makeText(
                                 this,
@@ -99,6 +87,7 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
     }
 
     override fun onStart() {
@@ -111,59 +100,34 @@ class LoginActivity : AppCompatActivity() {
             finish()
         } else {
             // If user is not logged in, show biometric prompt or login page
-            showBiometricPrompt()
         }
     }
 
-
-    // Biometric authentication function
-    private fun showBiometricPrompt() {
-        // Check if biometric authentication is available
+    private fun promptBiometricLogin() {
         val executor: Executor = ContextCompat.getMainExecutor(this)
         val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
-
-                // Authentication succeeded, now retrieve the stored email
-                val sharedPreferences = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
-                val userEmail = sharedPreferences.getString("user_email", null)
-
-                if (userEmail != null) {
-                    // Now sign in with the stored email
-                    FirebaseAuth.getInstance().signInWithEmailAndPassword(userEmail, "Bayarea5511884$")
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                // Login is successful, proceed to the main screen
-                                Toast.makeText(applicationContext, "Biometric Authentication Succeeded", Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                                finish()
-                            } else {
-                                // If the login fails
-                                Toast.makeText(applicationContext, "Authentication Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                } else {
-                    // If no email is found, show an error
-                    Toast.makeText(applicationContext, "No user found for biometric login", Toast.LENGTH_SHORT).show()
-                }
+                Toast.makeText(this@LoginActivity, "Biometric authentication successful!", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                finish()
             }
 
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
-                // If authentication fails, prompt the user to enter credentials manually
-                Toast.makeText(applicationContext, "Biometric Authentication Failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "Biometric authentication failed", Toast.LENGTH_SHORT).show()
             }
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 super.onAuthenticationError(errorCode, errString)
-                Toast.makeText(applicationContext, "Biometric Authentication Error: $errString", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
             }
         })
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Biometric login")
-            .setSubtitle("Log in using your fingerprint")
-            .setNegativeButtonText("Use Password")
+            .setTitle("Biometric Authentication")
+            .setSubtitle("Confirm your identity")
+            .setDeviceCredentialAllowed(true) // Allow PIN/password fallback
             .build()
 
         biometricPrompt.authenticate(promptInfo)
