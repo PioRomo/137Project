@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
+    android:background="@color/PrimaryPurple">
     tools:context=".ProfileActivity">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/profile_pic"
-        app:srcCompat="@drawable/profile_pic"
-        android:contentDescription="@string/profile_picture" />
+        android:layout_marginTop="141dp"
+        android:contentDescription="@string/profile_picture"
+        android:src="@drawable/profile_pic" />
+
 
     <TextView
         android:id="@+id/profile_name"
@@ -23,9 +23,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_image"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:text="My Profile"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#FFFFFF" />
 
     <TextView
         android:id="@+id/profile_location"
@@ -33,9 +34,46 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_name"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
         android:text="San Jose, CA"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF" />
 
-    <!-- Add more views for "Your Likes" and "Trade Requests" sections -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_your_likes"
+        android:layout_width="379dp"
+        android:layout_height="99dp"
+        android:layout_below="@id/profile_location"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="#FF8489AE"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"> <!-- RGBA color with 26% opacity -->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="97dp"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/your_likes_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Likes"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#FFFFFF" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_likes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/your_likes_header"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
 
 </RelativeLayout>
