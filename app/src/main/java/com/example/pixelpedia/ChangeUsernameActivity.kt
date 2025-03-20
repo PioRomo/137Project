@@ -1,22 +1,12 @@
 package com.example.pixelpedia
 
 import androidx.appcompat.app.AppCompatActivity
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.MotionEvent
-import android.view.View
-import android.view.WindowInsets
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
-import com.example.pixelpedia.databinding.ActivityChangeUsernameBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
@@ -35,8 +25,8 @@ class ChangeUsernameActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        editUsername = findViewById(R.id.changeUsernameText)
-        buttonSubmit = findViewById(R.id.changeUsernameSubmit)
+        editUsername = findViewById(R.id.resetPasswordText)
+        buttonSubmit = findViewById(R.id.resetPasswordSubmit)
         leftChevron = findViewById(R.id.leftChevron)
 
         leftChevron.setOnClickListener{

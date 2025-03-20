@@ -20,6 +20,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
     private lateinit var registerButton: Button
+    private lateinit var resetPasswordButton: Button
 
 
     //Firebase Auth instance
@@ -35,10 +36,11 @@ class LoginActivity : AppCompatActivity() {
         auth.signOut()
 
         //Initialize our views here
-        emailEditText = findViewById(R.id.changeUsernameText)
+        emailEditText = findViewById(R.id.resetPasswordText)
         passwordEditText = findViewById(R.id.loginPasswordText)
-        loginButton = findViewById(R.id.changeUsernameSubmit)
+        loginButton = findViewById(R.id.resetPasswordSubmit)
         registerButton = findViewById(R.id.loginRegisterButton)
+        resetPasswordButton =  findViewById(R.id.resetPasswordButton)
 
 
         //Handling Login logic
@@ -84,6 +86,11 @@ class LoginActivity : AppCompatActivity() {
         registerButton.setOnClickListener {
             //Open the register activity(screen)
             val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }
+
+        resetPasswordButton.setOnClickListener{
+            val intent = Intent(this, ResetPasswordActivity::class.java)
             startActivity(intent)
         }
 

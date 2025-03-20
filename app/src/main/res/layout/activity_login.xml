@@ -33,7 +33,7 @@
             android:textAllCaps="false" />
 
         <Button
-            android:id="@+id/changeUsernameSubmit"
+            android:id="@+id/resetPasswordSubmit"
             android:layout_width="237dp"
             android:layout_height="wrap_content"
             android:layout_above="@+id/resetPasswordButton"
@@ -70,7 +70,7 @@
             android:textSize="20sp" />
 
         <EditText
-            android:id="@+id/changeUsernameText"
+            android:id="@+id/resetPasswordText"
             android:layout_width="319dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -88,7 +88,7 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/changeUsernameTitle"
+            android:id="@+id/resetPasswordTitle"
             android:layout_width="111dp"
             android:layout_height="33dp"
             android:layout_alignParentStart="true"
