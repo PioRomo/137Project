@@ -1,24 +1,14 @@
 package com.example.pixelpedia
 
 import androidx.appcompat.app.AppCompatActivity
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.MotionEvent
-import android.view.View
-import android.view.WindowInsets
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
-import com.example.pixelpedia.databinding.ActivityChangeUsernameBinding
+import androidx.activity.enableEdgeToEdge
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ResetPasswordActivity : AppCompatActivity() {
@@ -30,6 +20,7 @@ class ResetPasswordActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_reset_password)
 
         auth = FirebaseAuth.getInstance()
@@ -40,7 +31,7 @@ class ResetPasswordActivity : AppCompatActivity() {
         leftChevron = findViewById(R.id.leftChevron)
 
         leftChevron.setOnClickListener{
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
 
