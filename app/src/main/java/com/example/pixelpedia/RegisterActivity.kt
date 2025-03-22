@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.text.InputType
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -25,7 +25,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var registerButton: Button
     private lateinit var backToLoginButton: Button
     private lateinit var auth: FirebaseAuth
-    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +32,6 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
 
         auth = FirebaseAuth.getInstance()
-        database = Firebase.database.reference
 
         userNameEditText = findViewById(R.id.registerUsernameText)
         emailEditText = findViewById(R.id.registerEmailText)
@@ -42,10 +40,11 @@ class RegisterActivity : AppCompatActivity() {
         registerButton = findViewById(R.id.registerRegisterButton)
         backToLoginButton = findViewById(R.id.registerBackToLogin)
 
-        // Set font var to fix password text not displaying on load
+        //Set font var to fix password text not displaying on load
         val poppinsFont = ResourcesCompat.getFont(this, R.font.poppins_bold)
 
-        // Toggling password visibility
+
+        //Toggling password visibility
         // Set password input type to hidden by default
         passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         passwordEditText.typeface = poppinsFont
@@ -80,18 +79,15 @@ class RegisterActivity : AppCompatActivity() {
                                 val userId = user.uid
                                 val userData = hashMapOf("username" to username, "email" to email)
 
-                                // Store user data in Realtime Database
-                                val userRef = database.child("users").child(userId)
-                                userRef.setValue(userData)
+                                FirebaseFirestore.getInstance().collection("users").document(userId)
+                                    .set(userData)
                                     .addOnSuccessListener {
-                                        // Data saved to Realtime Database successfully
                                         Toast.makeText(this, "User registered! Verify your email before logging in.", Toast.LENGTH_SHORT).show()
                                         auth.signOut() // Log out the user until they verify
                                         startActivity(Intent(this, LoginActivity::class.java))
                                     }
                                     .addOnFailureListener { e ->
-                                        // Handle Realtime Database save failure
-                                        Toast.makeText(this, "Failed to save user to Realtime Database: ${e.message}", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(this, "Failed to save user: ${e.message}", Toast.LENGTH_LONG).show()
                                     }
                             } else {
                                 Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_LONG).show()
@@ -106,17 +102,18 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        backToLoginButton.setOnClickListener {
+
+        backToLoginButton.setOnClickListener{
             finish()
         }
     }
 
-    private fun isValidPassword(password: String): Boolean {
+    private fun isValidPassword(password:String):Boolean {
         val passwordPattern = Regex("^(?=.*[A-Z])(?=.*[0-9])(?=.*[@#\$%^&+=!])(?=\\S+\$).{8,}\$")
         return password.matches(passwordPattern)
     }
 
-    private fun togglePasswordVisibility(view: View) {
+    private fun togglePasswordVisibility(view : View){
         val poppinsFont = ResourcesCompat.getFont(this, R.font.poppins_bold)
         // Check if the current input type is visible password
         if (passwordEditText.inputType == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
@@ -129,7 +126,7 @@ class RegisterActivity : AppCompatActivity() {
             togglePasswordVisibility.setImageResource(R.drawable.ic_visibility) // Open eye icon
         }
 
-        // Reapply the text so the cursor stays at the end and reset font
+        // Reapply the text so the cursor stays at the end and  reset font
         passwordEditText.typeface = poppinsFont
         passwordEditText.setSelection(passwordEditText.text.length)
     }
