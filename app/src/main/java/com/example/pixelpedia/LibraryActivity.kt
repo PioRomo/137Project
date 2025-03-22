@@ -16,10 +16,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class LibraryActivity : AppCompatActivity() {
-    private lateinit var settingsIcon: ImageView
+    private lateinit var editIcon: ImageView
     private lateinit var recyclerView: RecyclerView
+    private val gameList = mutableListOf<Pair<String, String>>() // Stores (gameId, imageUrl)
+    private var isEditMode = false // Track edit mode
     private lateinit var gameAdapter: GameAdapter
-    private val gameList = mutableListOf<String>() // Stores image URLs
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,15 +29,16 @@ class LibraryActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.libraryRecyclerView)
         recyclerView.layoutManager = GridLayoutManager(this, 3)
 
-        gameAdapter = GameAdapter(gameList)
+        gameAdapter = GameAdapter()
         recyclerView.adapter = gameAdapter
 
         fetchUserGames()
 
-        // Redirect to settings
-        settingsIcon = findViewById(R.id.setting)
-        settingsIcon.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+        // Toggle edit mode
+        editIcon = findViewById(R.id.edit)
+        editIcon.setOnClickListener {
+            isEditMode = !isEditMode
+            gameAdapter.notifyDataSetChanged()
         }
 
         // Bottom navigation
@@ -72,7 +74,7 @@ class LibraryActivity : AppCompatActivity() {
                             val gameImage = gameDoc.getString("gameimage") ?: ""
 
                             if (gameImage.isNotEmpty()) {
-                                gameList.add(gameImage)
+                                gameList.add(Pair(gameId, gameImage))
                                 gameAdapter.notifyDataSetChanged()
                             }
                         }
@@ -85,26 +87,57 @@ class LibraryActivity : AppCompatActivity() {
                 Log.e("LibraryActivity", "Error fetching owned games", e)
             }
     }
-}
 
-class GameAdapter(private val gameList: List<String>) :
-    RecyclerView.Adapter<GameAdapter.GameViewHolder>() {
+    private fun deleteGame(gameId: String) {
+        val db = FirebaseFirestore.getInstance()
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-    class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val gameImageView: ImageView = itemView.findViewById(R.id.gameImageView)
+        db.collection("users").document(userId).collection("owned_games")
+            .whereEqualTo("gameid", gameId)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    db.collection("users").document(userId).collection("owned_games")
+                        .document(document.id)
+                        .delete()
+                        .addOnSuccessListener {
+                            gameList.removeAll { it.first == gameId }
+                            gameAdapter.notifyDataSetChanged()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("LibraryActivity", "Error deleting game", e)
+                        }
+                }
+            }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.game_cell, parent, false)
-        return GameViewHolder(itemView)
-    }
+    inner class GameAdapter : RecyclerView.Adapter<GameAdapter.GameViewHolder>() {
 
-    override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
-        val imageUrl = gameList[position]
-        Glide.with(holder.itemView.context)
-            .load(imageUrl)
-            .into(holder.gameImageView)
-    }
+        inner class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val gameImageView: ImageView = itemView.findViewById(R.id.gameImageView)
+            val deleteIcon: ImageView = itemView.findViewById(R.id.deleteIcon)
+        }
 
-    override fun getItemCount(): Int = gameList.size
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
+            val itemView = LayoutInflater.from(parent.context).inflate(R.layout.game_cell, parent, false)
+            return GameViewHolder(itemView)
+        }
+
+        override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
+            val (gameId, imageUrl) = gameList[position]
+
+            Glide.with(holder.itemView.context)
+                .load(imageUrl)
+                .into(holder.gameImageView)
+
+            // Show delete icon only in edit mode
+            holder.deleteIcon.visibility = if (isEditMode) View.VISIBLE else View.GONE
+
+            holder.deleteIcon.setOnClickListener {
+                deleteGame(gameId)
+            }
+        }
+
+        override fun getItemCount(): Int = gameList.size
+    }
 }

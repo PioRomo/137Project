@@ -7,11 +7,28 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp">
 
-    <ImageView
-        android:id="@+id/gameImageView"
+    <!-- FrameLayout to stack elements -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/placeholder_game_image" />
+        android:layout_height="wrap_content">
+
+        <!-- Game Image -->
+        <ImageView
+            android:id="@+id/gameImageView"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_game_image" />
+
+        <!-- Delete Icon (Top-Right Corner) -->
+        <ImageView
+            android:id="@+id/deleteIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:src="@drawable/red_minus_icon"
+            android:visibility="gone"/>
+    </FrameLayout>
 
 </androidx.cardview.widget.CardView>
