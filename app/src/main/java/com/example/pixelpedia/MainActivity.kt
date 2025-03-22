@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.DocumentSnapshot
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,14 +20,16 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var gameImageView: ImageView
     private lateinit var gameNameTextView: TextView
-    private lateinit var database: DatabaseReference
+
+    // Firestore instance
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Initialize views
-        settingsIcon = findViewById(R.id.settingsIcon)
+        settingsIcon = findViewById(R.id.setting)
 
         auth = FirebaseAuth.getInstance()
 
@@ -43,31 +46,30 @@ class MainActivity : AppCompatActivity() {
         gameImageView = findViewById(R.id.gameImageView) // Make sure this ID exists in your layout
         gameNameTextView = findViewById(R.id.gameNameTextView) // Make sure this ID exists in your layout
 
+        // Initialize Firestore
+        firestore = FirebaseFirestore.getInstance()
 
-        // Initialize Firebase Database
-        database = FirebaseDatabase.getInstance().reference.child("games").child("12345")
+        // Fetch game data from Firestore
+        val gameDocRef = firestore.collection("games").document("DPJYIx6FocQ1FxgCI288")
 
-        // Fetch game data
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val gameName = snapshot.child("gamename").getValue(String::class.java)
-                    val gameImage = snapshot.child("gameimage").getValue(String::class.java)
+        gameDocRef.get().addOnSuccessListener { document: DocumentSnapshot? ->
+            if (document != null && document.exists()) {
+                val gameName = document.getString("gamename")
+                val gameImage = document.getString("gameimage")
 
-                    // Set text
-                    gameNameTextView.text = gameName ?: "Unknown Game"
+                // Set text
+                gameNameTextView.text = gameName ?: "Unknown Game"
 
-                    // Load image using Glide
-                    Glide.with(this@MainActivity)
-                        .load(gameImage)
-                        .into(gameImageView)
-                }
+                // Load image using Glide
+                Glide.with(this@MainActivity)
+                    .load(gameImage)
+                    .into(gameImageView)
+            } else {
+                Toast.makeText(this, "Game not found", Toast.LENGTH_SHORT).show()
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error
-            }
-        })
+        }.addOnFailureListener { exception ->
+            Toast.makeText(this, "Error getting document: ${exception.message}", Toast.LENGTH_SHORT).show()
+        }
 
         // Redirect to settings
         settingsIcon.setOnClickListener {
@@ -97,13 +99,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }
-
-
-
-
-
-
-
