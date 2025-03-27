@@ -17,6 +17,7 @@ class IndividualGameActivity : AppCompatActivity() {
     private var gameGenreTextView: TextView? = null
     private var gameConsoleTextView: TextView? = null
     private var gameImageView: ImageView? = null
+    private var gameDescriptionView: TextView? = null
     private lateinit var leftChevron: ImageView
     private lateinit var addButton: ImageView
     private var db: FirebaseFirestore? = null
@@ -30,6 +31,7 @@ class IndividualGameActivity : AppCompatActivity() {
         gameGenreTextView = findViewById<TextView>(R.id.gameGenre)
         gameConsoleTextView = findViewById<TextView>(R.id.gameConsole)
         gameImageView = findViewById<ImageView>(R.id.gameImage)
+        gameDescriptionView = findViewById(R.id.gameDescription)
         leftChevron =  findViewById(R.id.leftChevron)
         addButton = findViewById(R.id.addButton)
 
@@ -62,10 +64,12 @@ class IndividualGameActivity : AppCompatActivity() {
                     val gameGenre = documentSnapshot.getString("gamegenre")
                     val gameConsole = documentSnapshot.getString("gameconsole")
                     val gameImage = documentSnapshot.getString("gameimage")
+                    val gameDescription = documentSnapshot.getString("gamedescription")
 
                     gameNameTextView!!.text = gameName
                     gameGenreTextView!!.text = gameGenre
                     gameConsoleTextView!!.text = gameConsole
+                    gameDescriptionView!!.text = gameDescription
 
 
                     // Load image using Glide or Picasso
