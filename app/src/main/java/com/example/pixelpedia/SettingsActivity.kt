@@ -52,7 +52,6 @@ class SettingsActivity : AppCompatActivity() {
         deleteAccountButton = findViewById(R.id.delete_account)
         changeUsernameButton = findViewById(R.id.change_username)
         leftChevron = findViewById(R.id.leftChevron)
-        biometricToggle = findViewById(R.id.biometric_switch)
         locationButton = findViewById(R.id.change_location)
 
 

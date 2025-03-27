@@ -71,6 +71,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Error getting document: ${exception.message}", Toast.LENGTH_SHORT).show()
         }
 
+        gameImageView.setOnClickListener {
+            val intent = Intent(this, IndividualGameActivity::class.java)
+            intent.putExtra("gameId", "DPJYIx6FocQ1FxgCI288")
+            startActivity(intent)
+        }
+
         // Redirect to settings
         settingsIcon.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
