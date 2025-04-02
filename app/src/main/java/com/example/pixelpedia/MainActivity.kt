@@ -2,6 +2,7 @@ package com.example.pixelpedia
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +28,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val searchBar: EditText = findViewById(R.id.searchBar)
+
+        searchBar.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val intent = Intent(this, SearchActivity::class.java)
+                startActivity(intent)
+            }
+        }
 
         // Initialize views
         settingsIcon = findViewById(R.id.setting)
@@ -83,6 +93,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Reset the focus when returning from SearchActivity
+        val searchBar: EditText = findViewById(R.id.searchBar)
+        searchBar.clearFocus() // Clear focus to ensure search bar is not focused
+    }
+
     private fun loadGames() {
         firestore.collection("games").limit(12).get()
             .addOnSuccessListener { documents ->
@@ -106,3 +123,4 @@ class MainActivity : AppCompatActivity() {
         )
     }
 }
+

@@ -8,15 +8,24 @@
     <string name="title_activity_change_username">ChangeUsernameActivity</string>
     <string name="title_activity_individual_game">IndividualGameActivity</string>
     <string-array name="sort_options">
+        <item>Relevance</item>
         <item>Alphabetical</item>
-        <item>Most Relevant</item>
     </string-array>
     <string-array name="genre_options">
-        <item>Any</item>
+        <item>Genre</item>
         <item>Sports</item>
         <item>Action-adventure</item>
         <item>Battle Royale</item>
         <item>Platform</item>
         <item>Survival</item>
+    </string-array>
+    <string-array name="console_options">
+        <item>Console</item>
+        <item>Wii</item>
+        <item>PS5</item>
+        <item>Cross-platform</item>
+        <item>N64</item>
+        <item>Nintendo Switch</item>
+        <item>GameCube</item>
     </string-array>
 </resources>

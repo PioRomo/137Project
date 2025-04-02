@@ -69,7 +69,12 @@ class LibraryActivity : AppCompatActivity() {
             }
         }
     }
-
+    override fun onResume() {
+        super.onResume()
+        // Reset the focus when returning from SearchActivity
+        val searchBar: EditText = findViewById(R.id.searchBar)
+        searchBar.clearFocus() // Clear focus to ensure search bar is not focused
+    }
     private fun fetchUserGames() {
         val db = FirebaseFirestore.getInstance()
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return

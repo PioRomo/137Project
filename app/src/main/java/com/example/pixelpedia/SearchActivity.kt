@@ -1,5 +1,5 @@
 package com.example.pixelpedia
-
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.content.Context
 import android.content.Intent
@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
@@ -22,6 +23,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var gameAdapter: GameAdapter
     private lateinit var sortSpinner: Spinner
     private lateinit var genreSpinner: Spinner
+    private lateinit var consoleSpinner: Spinner
 
     private var allGames: MutableList<Game> = mutableListOf() // Full game list from Firestore
     private var filteredGames: MutableList<Game> = mutableListOf() // Search results
@@ -35,12 +37,19 @@ class SearchActivity : AppCompatActivity() {
         gameRecyclerView = findViewById(R.id.gameRecyclerView)
         sortSpinner = findViewById(R.id.sortSpinner)
         genreSpinner = findViewById(R.id.genreSpinner)
+        consoleSpinner = findViewById(R.id.consoleSpinner)
 
         // Set up Spinner with predefined genres
         val genreAdapter = ArrayAdapter.createFromResource(
             this, R.array.genre_options, android.R.layout.simple_spinner_dropdown_item
         )
         genreSpinner.adapter = genreAdapter
+
+        // Set up Spinner with predefined genres
+        val consoleAdapter = ArrayAdapter.createFromResource(
+            this, R.array.console_options, android.R.layout.simple_spinner_dropdown_item
+        )
+        consoleSpinner.adapter = consoleAdapter
 
         // Set up RecyclerView & Adapter
         gameAdapter = GameAdapter(filteredGames) { selectedGame ->
@@ -63,6 +72,27 @@ class SearchActivity : AppCompatActivity() {
             }
         })
 
+        genreSpinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                filterGames(searchEditText.text.toString())
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {
+
+            }
+        })
+        consoleSpinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                filterGames(searchEditText.text.toString()) // Apply filter when console selection changes
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {
+
+            }
+        })
+
+
+
         // Focus and show keyboard
         searchEditText.requestFocus() // Focus on the EditText
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -79,9 +109,10 @@ class SearchActivity : AppCompatActivity() {
                     val gameId = document.id
                     val gameName = document.getString("gamename") ?: ""
                     val gameImage = document.getString("gameimage") ?: ""
+                    val gameConsole = document.getString("gameconsole") ?: ""
                     val gameGenre = document.getString("gamegenre") ?: ""
 
-                    allGames.add(Game(gameId, gameName, gameImage, gameGenre))
+                    allGames.add(Game(gameId, gameName, gameImage, gameConsole, gameGenre))
                 }
 
                 // Ensure genreSpinner is ready before filtering
@@ -95,13 +126,16 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun filterGames(query: String) {
-        val genreFilter = genreSpinner.selectedItem?.toString() ?: "Any" // Prevent crash
+        val genreFilter = genreSpinner.selectedItem?.toString() ?: "Genre"  // Default to "Genre"
+        val consoleFilter = consoleSpinner.selectedItem?.toString() ?: "Console" // Default to "Console"
 
         filteredGames.clear()
         filteredGames.addAll(allGames.filter {
             it.gamename.contains(query, ignoreCase = true) &&
-                    (genreFilter == "Any" || it.gamegenre == genreFilter)
+                    (genreFilter == "Genre" || it.gamegenre == genreFilter) &&
+                    (consoleFilter == "Console" || it.gameconsole == consoleFilter) // Add console filter here
         })
-        gameAdapter.notifyDataSetChanged()
+        gameAdapter.notifyDataSetChanged() // Notify the adapter of the filtered list
     }
+
 }
