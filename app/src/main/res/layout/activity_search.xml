@@ -20,19 +20,12 @@
         <ImageView
             android:id="@+id/pixelpedialogo"
             android:layout_width="65dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="0dp"
-            android:src="@drawable/pixelpedialogo" />
-
-        <ImageView
-            android:id="@+id/edit"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/edit"
+            android:layout_height="65dp"
+            android:src="@drawable/pixelpedialogo"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="0dp"
             android:layout_centerVertical="true"/>
+
     </RelativeLayout>
     <!-- Search Bar -->
     <EditText
@@ -55,25 +48,33 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp">
 
-        <!-- Sort Dropdown -->
         <Spinner
             android:id="@+id/sortSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
             android:background="@drawable/filter_background"
             android:textColor="@android:color/white"
             android:entries="@array/sort_options"/>
 
-        <!-- Genre Dropdown -->
         <Spinner
             android:id="@+id/genreSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_width="0dp"
+            android:paddingStart="28dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
             android:background="@drawable/filter_background"
             android:textColor="@android:color/white"
             android:entries="@array/genre_options"/>
 
+        <Spinner
+            android:id="@+id/consoleSpinner"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/filter_background"
+            android:textColor="@android:color/white"
+            android:entries="@array/console_options"/>
     </LinearLayout>
 
     <!-- RecyclerView to show game results -->
