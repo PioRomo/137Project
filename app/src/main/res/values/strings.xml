@@ -7,4 +7,16 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_activity_change_username">ChangeUsernameActivity</string>
     <string name="title_activity_individual_game">IndividualGameActivity</string>
+    <string-array name="sort_options">
+        <item>Alphabetical</item>
+        <item>Most Relevant</item>
+    </string-array>
+    <string-array name="genre_options">
+        <item>Any</item>
+        <item>Sports</item>
+        <item>Action-adventure</item>
+        <item>Battle Royale</item>
+        <item>Platform</item>
+        <item>Survival</item>
+    </string-array>
 </resources>

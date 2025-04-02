@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -23,8 +24,18 @@ class LibraryActivity : AppCompatActivity() {
     private lateinit var gameAdapter: GameAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_library)
+
+        val searchBar: EditText = findViewById(R.id.searchBar)
+
+        searchBar.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val intent = Intent(this, SearchActivity::class.java)
+                startActivity(intent)
+            }
+        }
 
         recyclerView = findViewById(R.id.libraryRecyclerView)
         recyclerView.layoutManager = GridLayoutManager(this, 3)
