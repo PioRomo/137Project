@@ -119,7 +119,10 @@ class MainActivity : AppCompatActivity() {
         return Game(
             gameId = this.id,
             gamename = this.getString("gamename") ?: "Unknown Game",
-            gameimage = this.getString("gameimage") ?: ""
+            gameimage = this.getString("gameimage") ?: "",
+            gameconsole = this.getString("gameconsole") ?: "Unknown Console",
+            gamegenre = this.getString("gamegenre") ?: "Unknown Genre",
+            gamedescription = this.getString("gamedescription") ?: "No Description Available"
         )
     }
 }

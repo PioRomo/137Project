@@ -39,6 +39,11 @@ class SearchActivity : AppCompatActivity() {
         genreSpinner = findViewById(R.id.genreSpinner)
         consoleSpinner = findViewById(R.id.consoleSpinner)
 
+        val sortAdapter = ArrayAdapter.createFromResource(
+            this, R.array.sort_options, android.R.layout.simple_spinner_dropdown_item
+        )
+        sortSpinner.adapter = sortAdapter
+
         // Set up Spinner with predefined genres
         val genreAdapter = ArrayAdapter.createFromResource(
             this, R.array.genre_options, android.R.layout.simple_spinner_dropdown_item
@@ -90,6 +95,15 @@ class SearchActivity : AppCompatActivity() {
 
             }
         })
+        sortSpinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
+                filterGames(searchEditText.text.toString()) // Apply filter when console selection changes
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {
+
+            }
+        })
 
 
 
@@ -111,8 +125,8 @@ class SearchActivity : AppCompatActivity() {
                     val gameImage = document.getString("gameimage") ?: ""
                     val gameConsole = document.getString("gameconsole") ?: ""
                     val gameGenre = document.getString("gamegenre") ?: ""
-
-                    allGames.add(Game(gameId, gameName, gameImage, gameConsole, gameGenre))
+                    val gameDescription = document.getString("gamedescription") ?: ""
+                    allGames.add(Game(gameId, gameName, gameImage, gameConsole, gameGenre, gameDescription))
                 }
 
                 // Ensure genreSpinner is ready before filtering
@@ -126,16 +140,23 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun filterGames(query: String) {
-        val genreFilter = genreSpinner.selectedItem?.toString() ?: "Genre"  // Default to "Genre"
-        val consoleFilter = consoleSpinner.selectedItem?.toString() ?: "Console" // Default to "Console"
+        val genreFilter = genreSpinner.selectedItem?.toString() ?: "Genre"
+        val consoleFilter = consoleSpinner.selectedItem?.toString() ?: "Console"
+        val sortOption = sortSpinner.selectedItem?.toString() ?: ""
 
         filteredGames.clear()
         filteredGames.addAll(allGames.filter {
             it.gamename.contains(query, ignoreCase = true) &&
                     (genreFilter == "Genre" || it.gamegenre == genreFilter) &&
-                    (consoleFilter == "Console" || it.gameconsole == consoleFilter) // Add console filter here
+                    (consoleFilter == "Console" || it.gameconsole == consoleFilter)
         })
-        gameAdapter.notifyDataSetChanged() // Notify the adapter of the filtered list
+
+        if (sortOption == "Alphabetical") {
+            filteredGames.sortBy { it.gamename.lowercase() }
+        }
+
+        gameAdapter.notifyDataSetChanged()
     }
+
 
 }

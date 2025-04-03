@@ -5,7 +5,8 @@ data class Game(
     var gamename: String = "",
     var gameimage: String = "",
     var gameconsole: String = "",
-    var gamegenre: String = ""
+    var gamegenre: String = "",
+    var gamedescription: String = ""
 ) {
 
 }
