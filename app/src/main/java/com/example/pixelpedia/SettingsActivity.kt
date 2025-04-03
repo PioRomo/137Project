@@ -35,7 +35,6 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var deleteAccountButton: Button
     private lateinit var changeUsernameButton: Button
     private lateinit var leftChevron: ImageView
-    private lateinit var biometricToggle: Switch
     private lateinit var locationButton: Button
 
 
@@ -55,24 +54,6 @@ class SettingsActivity : AppCompatActivity() {
         locationButton = findViewById(R.id.change_location)
 
 
-
-        //Biometric Toggle function
-        loadBiometricStatus()
-        biometricToggle.setOnCheckedChangeListener(){ _, isChecked ->
-            val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
-
-            if (isChecked) {
-                promptForPassword()
-            } else {
-                disableBiometricLogin()
-                loadBiometricStatus()
-            }
-
-            editor.putBoolean("biometric_enabled", isChecked) // Save the setting
-            editor.apply()
-        }
-
         //Set location function
         locationButton.setOnClickListener {
             showLocationDialog()
@@ -90,17 +71,7 @@ class SettingsActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-        /*
-        resetPasswordButton.setOnClickListener {
-            // Get the current logged-in user's email
-            val userEmail = auth.currentUser?.email
 
-            if (userEmail != null) {
-                sendPasswordResetEmail(userEmail)
-            } else {
-                Toast.makeText(this, "No user is logged in.", Toast.LENGTH_SHORT).show()
-            }
-        }*/
 
         //Log out functionality
         logOutButton.setOnClickListener{
@@ -201,113 +172,6 @@ class SettingsActivity : AppCompatActivity() {
             }
     }
 
-    private fun sendPasswordResetEmail(email: String) {
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Successfully sent the reset email
-                    Toast.makeText(this, "Reset email sent to $email. Please check your inbox.", Toast.LENGTH_SHORT).show()
-                } else {
-                    // Failed to send the reset email
-                    Toast.makeText(this, "Failed to send reset email. Please try again.", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-
-    private fun loadBiometricStatus(){
-        val userId = auth.currentUser?.uid ?: return
-        val db = FirebaseFirestore.getInstance()
-        db.collection("users").document(userId).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val biometricEnabled = document.getBoolean("biometric_enabled") ?: false
-                    biometricToggle.isChecked = biometricEnabled
-                } else {
-                    biometricToggle.isChecked = false // default state if no data exists
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("BiometricStatus", "Failed to load biometric status: ${e.message}")
-            }
-    }
-
-    private fun promptForPassword(){
-        val dialog = AlertDialog.Builder(this)
-        val input = EditText(this)
-        input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        dialog.setView(input)
-        dialog.setTitle("Enter Password")
-
-        dialog.setPositiveButton("Submit") { _, _ ->
-            val enteredPassword = input.text.toString()
-            verifyPassword(enteredPassword)
-        }
-
-        dialog.setNegativeButton("Cancel") { _, _ ->
-            biometricToggle.isChecked = false // Disable the toggle if canceled
-        }
-
-        dialog.show()
-    }
-
-    private fun verifyPassword(password: String){
-        val user = auth.currentUser
-        if (user != null && user.email != null) {
-            val credential = EmailAuthProvider.getCredential(user.email!!, password)
-            user.reauthenticate(credential)
-                .addOnSuccessListener {
-                    enableBiometricLogin(user.uid)
-                    loadBiometricStatus()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show()
-                    biometricToggle.isChecked = false // Reset switch
-                }
-        }
-    }
-
-    private fun enableBiometricLogin(userId: String) {
-        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-
-        db.collection("users").document(userId)
-            .update(mapOf(
-                "biometric_enabled" to true,
-                "biometric_device_id" to deviceId
-            ))
-            .addOnSuccessListener {
-                val sharedPreferences = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
-                val editor = sharedPreferences.edit()
-                editor.putBoolean("biometric_login_enabled", true)  // Store the biometric enabled flag
-                editor.apply()
-                Toast.makeText(this, "Biometric login enabled!", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to enable biometric login", Toast.LENGTH_SHORT).show()
-                biometricToggle.isChecked = false
-            }
-    }
-
-    private fun disableBiometricLogin() {
-        val userId = auth.currentUser?.uid ?: return
-        db.collection("users").document(userId)
-            .update(mapOf(
-                "biometric_enabled" to false,   // Disable biometric login
-                "biometric_device_id" to ""     // Optionally reset the device ID if needed
-            ))
-            .addOnSuccessListener {
-                val sharedPreferences = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
-                val editor = sharedPreferences.edit()
-                editor.putBoolean("biometric_login_enabled", false)
-                editor.apply()
-
-                Toast.makeText(this, "Biometric login disabled!", Toast.LENGTH_SHORT).show()
-                biometricToggle.isChecked = false  // Update toggle to reflect the disabled state
-                loadBiometricStatus()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to disable biometric login", Toast.LENGTH_SHORT).show()
-            }
-    }
 
     private fun showLocationDialog() {
         // Create an AlertDialog with two options
