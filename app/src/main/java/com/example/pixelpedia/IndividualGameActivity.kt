@@ -8,82 +8,126 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-
 class IndividualGameActivity : AppCompatActivity() {
-    private var gameNameTextView: TextView? = null
-    private var gameGenreTextView: TextView? = null
-    private var gameConsoleTextView: TextView? = null
-    private var gameImageView: ImageView? = null
-    private var gameDescriptionView: TextView? = null
+    private lateinit var gameNameTextView: TextView
+    private lateinit var gameGenreTextView: TextView
+    private lateinit var gameConsoleTextView: TextView
+    private lateinit var gameImageView: ImageView
+    private lateinit var gameDescriptionView: TextView
     private lateinit var leftChevron: ImageView
     private lateinit var addButton: ImageView
-    private var db: FirebaseFirestore? = null
+
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    private var gameId: String? = null
+    private var gameName: String? = null
+    private var gameImage: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_individual_game)
         enableEdgeToEdge()
 
-        gameNameTextView = findViewById<TextView>(R.id.gameTitle)
-        gameGenreTextView = findViewById<TextView>(R.id.gameGenre)
-        gameConsoleTextView = findViewById<TextView>(R.id.gameConsole)
-        gameImageView = findViewById<ImageView>(R.id.gameImage)
+        // Initialize views
+        gameNameTextView = findViewById(R.id.gameTitle)
+        gameGenreTextView = findViewById(R.id.gameGenre)
+        gameConsoleTextView = findViewById(R.id.gameConsole)
+        gameImageView = findViewById(R.id.gameImage)
         gameDescriptionView = findViewById(R.id.gameDescription)
-        leftChevron =  findViewById(R.id.leftChevron)
+        leftChevron = findViewById(R.id.leftChevron)
         addButton = findViewById(R.id.addButton)
 
-        db = FirebaseFirestore.getInstance()
-
-        leftChevron.setOnClickListener{
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
-
-        addButton.setOnClickListener{
-            //add logic!
-            Toast.makeText(this, "Add button clicked!", Toast.LENGTH_SHORT).show()
+        // Set up back navigation
+        leftChevron.setOnClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
         }
 
         // Get game ID from intent
-        val gameId = intent.getStringExtra("gameId")
-        if (gameId != null) {
-            loadGameDetails(gameId)
+        gameId = intent.getStringExtra("gameId")
+        if (gameId == null) {
+            Toast.makeText(this, "Error: Game ID not found.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
 
+        // Load game details
+        loadGameDetails(gameId!!)
 
+        checkIfGameExists()
+        addButton.setOnClickListener{
+            addGameToUserCollection()
+        }
     }
 
     private fun loadGameDetails(gameId: String) {
-        db!!.collection("games").document(gameId).get()
+        db.collection("games").document(gameId).get()
             .addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
                 if (documentSnapshot.exists()) {
-                    val gameName = documentSnapshot.getString("gamename")
+                    gameName = documentSnapshot.getString("gamename")
                     val gameGenre = documentSnapshot.getString("gamegenre")
                     val gameConsole = documentSnapshot.getString("gameconsole")
-                    val gameImage = documentSnapshot.getString("gameimage")
+                    gameImage = documentSnapshot.getString("gameimage")
                     val gameDescription = documentSnapshot.getString("gamedescription")
 
-                    gameNameTextView!!.text = gameName
-                    gameGenreTextView!!.text = gameGenre
-                    gameConsoleTextView!!.text = gameConsole
-                    gameDescriptionView!!.text = gameDescription
+                    // Set text views
+                    gameNameTextView.text = gameName ?: "Unknown Game"
+                    gameGenreTextView.text = gameGenre ?: "Unknown Genre"
+                    gameConsoleTextView.text = gameConsole ?: "Unknown Console"
+                    gameDescriptionView.text = gameDescription ?: "No Description Available"
 
+                    // Load image with Glide
+                    Glide.with(this).load(gameImage).into(gameImageView)
 
-                    // Load image using Glide or Picasso
-                    Glide.with(this).load(gameImage).into(gameImageView!!)
+                    // Check if game is already in the user's collection
+                    checkIfGameExists()
                 }
             }
-            .addOnFailureListener { e: Exception? ->
-                Toast.makeText(
-                    this,
-                    "Failed to load game details",
-                    Toast.LENGTH_SHORT
-                ).show()
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load game details", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun checkIfGameExists() {
+        val userId = auth.currentUser?.uid ?: return
+        val userGamesRef = db.collection("users").document(userId).collection("owned_games")
+
+        gameId?.let { id ->
+            userGamesRef.document(id).get().addOnSuccessListener { document ->
+                if (document.exists()) {
+                    addButton.visibility = ImageView.GONE // Hide button if game is already owned
+                } else {
+                    addButton.visibility = ImageView.VISIBLE // Show button if game is not owned
+                    addButton.setOnClickListener { addGameToUserCollection() } // Add click listener
+                }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Error checking game ownership", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun addGameToUserCollection() {
+        val userId = auth.currentUser?.uid ?: return
+        val userGamesRef = db.collection("users").document(userId).collection("owned_games")
+
+        gameId?.let { id ->
+            val gameData = hashMapOf(
+                "gameid" to id
+            )
+
+            userGamesRef.document(id).set(gameData)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Game added successfully!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, LibraryActivity::class.java))
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Failed to add game: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
 }
-
-

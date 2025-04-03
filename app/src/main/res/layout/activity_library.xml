@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/PrimaryPurple"
     tools:context=".LibraryActivity">
 
     <!-- Top Bar with Logo and Chevron -->
     <RelativeLayout
         android:id="@+id/topBar"
-        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:layout_marginTop="16dp"
         android:background="@color/PrimaryPurple"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/pixelpedialogo"
@@ -30,17 +30,18 @@
             android:id="@+id/edit"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/edit"
             android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:layout_marginEnd="16dp"
-            android:layout_centerVertical="true"/>
+            android:src="@drawable/edit" />
     </RelativeLayout>
+
     <EditText
         android:id="@+id/searchBar"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/search_bar_background"
         android:hint="Search"
@@ -48,9 +49,9 @@
         android:paddingEnd="50dp"
         android:textColor="@android:color/white"
         android:textColorHint="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
 
     <!-- RecyclerView for Library -->
 
@@ -74,9 +75,9 @@
         android:background="@color/PrimaryPurple"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
-        app:menu="@menu/bottom_nav_menu"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

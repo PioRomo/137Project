@@ -152,6 +152,12 @@ class LibraryActivity : AppCompatActivity() {
             holder.deleteIcon.setOnClickListener {
                 deleteGame(gameId)
             }
+
+            holder.gameImageView.setOnClickListener {
+                val intent = Intent(holder.itemView.context, IndividualGameActivity::class.java)
+                intent.putExtra("gameId", gameId) // Pass gameId to next screen
+                holder.itemView.context.startActivity(intent)
+            }
         }
 
         override fun getItemCount(): Int = gameList.size
