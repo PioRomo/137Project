@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -23,8 +24,18 @@ class LibraryActivity : AppCompatActivity() {
     private lateinit var gameAdapter: GameAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_library)
+
+        val searchBar: EditText = findViewById(R.id.searchBar)
+
+        searchBar.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val intent = Intent(this, SearchActivity::class.java)
+                startActivity(intent)
+            }
+        }
 
         recyclerView = findViewById(R.id.libraryRecyclerView)
         recyclerView.layoutManager = GridLayoutManager(this, 3)
@@ -58,7 +69,12 @@ class LibraryActivity : AppCompatActivity() {
             }
         }
     }
-
+    override fun onResume() {
+        super.onResume()
+        // Reset the focus when returning from SearchActivity
+        val searchBar: EditText = findViewById(R.id.searchBar)
+        searchBar.clearFocus() // Clear focus to ensure search bar is not focused
+    }
     private fun fetchUserGames() {
         val db = FirebaseFirestore.getInstance()
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -135,6 +151,12 @@ class LibraryActivity : AppCompatActivity() {
 
             holder.deleteIcon.setOnClickListener {
                 deleteGame(gameId)
+            }
+
+            holder.gameImageView.setOnClickListener {
+                val intent = Intent(holder.itemView.context, IndividualGameActivity::class.java)
+                intent.putExtra("gameId", gameId) // Pass gameId to next screen
+                holder.itemView.context.startActivity(intent)
             }
         }
 
