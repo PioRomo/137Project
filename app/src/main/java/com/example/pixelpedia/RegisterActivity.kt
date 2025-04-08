@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import android.text.InputType
+import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -39,24 +40,17 @@ class RegisterActivity : AppCompatActivity() {
         registerButton = findViewById(R.id.registerRegisterButton)
         backToLoginButton = findViewById(R.id.registerBackToLogin)
 
+        //Set font var to fix password text not displaying on load
+        val poppinsFont = ResourcesCompat.getFont(this, R.font.poppins_bold)
+
+
         //Toggling password visibility
         // Set password input type to hidden by default
         passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        passwordEditText.typeface = poppinsFont
 
         togglePasswordVisibility.setOnClickListener {
-            // Check if the current input type is visible password
-            if (passwordEditText.inputType == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
-                // Set input type to hidden password
-                passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                togglePasswordVisibility.setImageResource(R.drawable.ic_visibility_off) // Closed eye icon
-            } else {
-                // Set input type to visible password
-                passwordEditText.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                togglePasswordVisibility.setImageResource(R.drawable.ic_visibility) // Open eye icon
-            }
-
-            // Reapply the text so the cursor stays at the end
-            passwordEditText.setSelection(passwordEditText.text.length)
+            togglePasswordVisibility(it)
         }
 
         registerButton.setOnClickListener {
@@ -117,5 +111,23 @@ class RegisterActivity : AppCompatActivity() {
     private fun isValidPassword(password:String):Boolean {
         val passwordPattern = Regex("^(?=.*[A-Z])(?=.*[0-9])(?=.*[@#\$%^&+=!])(?=\\S+\$).{8,}\$")
         return password.matches(passwordPattern)
+    }
+
+    private fun togglePasswordVisibility(view : View){
+        val poppinsFont = ResourcesCompat.getFont(this, R.font.poppins_bold)
+        // Check if the current input type is visible password
+        if (passwordEditText.inputType == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
+            // Set input type to hidden password
+            passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            togglePasswordVisibility.setImageResource(R.drawable.ic_visibility_off) // Closed eye icon
+        } else {
+            // Set input type to visible password
+            passwordEditText.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            togglePasswordVisibility.setImageResource(R.drawable.ic_visibility) // Open eye icon
+        }
+
+        // Reapply the text so the cursor stays at the end and  reset font
+        passwordEditText.typeface = poppinsFont
+        passwordEditText.setSelection(passwordEditText.text.length)
     }
 }
