@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,114 +9,117 @@
     android:background="@color/PrimaryPurple"
     tools:context=".MainActivity">
 
-    <!-- Top Bar with Logo and Settings Icon -->
-    <RelativeLayout
-        android:id="@+id/topBar"
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/PrimaryPurple"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNav"
+        android:fillViewport="true">
 
-        <ImageView
-            android:id="@+id/logo"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
-            android:src="@drawable/pixelpedialogo" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/PrimaryPurple">
 
-        <ImageView
-            android:id="@+id/setting"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/setting" />
-    </RelativeLayout>
+            <!-- Top Bar with Logo and Settings Icon -->
 
-    <!-- Search Bar -->
+            <!-- Greeting -->
 
+            <RelativeLayout
+                android:id="@+id/topBar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/PrimaryPurple">
 
-    <!-- Title Text -->
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/pixelpedialogo" />
 
-    <TextView
-        android:id="@+id/userGreeting"
-        android:layout_width="398dp"
-        android:layout_height="50dp"
-        android:fontFamily="@font/poppins_bold"
-        android:paddingBottom="16dp"
-        android:text="Hello!"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/searchBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.65"
-        app:layout_constraintStart_toStartOf="@+id/topBar"
-        app:layout_constraintTop_toBottomOf="@+id/topBar"
-        app:layout_constraintVertical_bias="1.0" />
+                <ImageView
+                    android:id="@+id/setting"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/setting" />
+            </RelativeLayout>
 
-    <EditText
-        android:id="@+id/searchBar"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="52dp"
-        android:background="@color/PrimaryPurple"
-        android:hint="Search"
-        android:paddingStart="15dp"
-        android:paddingEnd="50dp"
-        android:textColor="@android:color/white"
-        android:textColorHint="@android:color/darker_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar" />
+            <TextView
+                android:id="@+id/userGreeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Hello!"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:fontFamily="@font/poppins_bold" />
 
-    <TextView
-        android:id="@+id/browseGamesTitle"
-        android:layout_width="205dp"
-        android:layout_height="41dp"
-        android:fontFamily="@font/poppins_bold"
-        android:gravity="center"
-        android:paddingBottom="8dp"
-        android:text="Browse Games"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/gameRecyclerView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.064"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchBar"
-        app:layout_constraintVertical_bias="1.0" />
+            <!-- Search Bar -->
+            <EditText
+                android:id="@+id/searchBar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:hint="Search"
+                android:paddingStart="15dp"
+                android:paddingEnd="50dp"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/darker_gray"
+                android:background="@color/PrimaryPurple" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/gameRecyclerView"
-        android:layout_width="408dp"
-        android:layout_height="476dp"
-        android:padding="16dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topProfilesContainer"
-        app:layout_constraintVertical_bias="0.405" />
+            <!-- Browse Games -->
+            <TextView
+                android:id="@+id/browseGamesTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Browse Games"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:fontFamily="@font/poppins_bold" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/gameRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:padding="8dp"
+                android:scrollbars="vertical" />
 
-    <!-- Bottom Navigation Bar -->
+            <!-- Browse Profiles -->
+            <TextView
+                android:id="@+id/browseProfilesTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Browse Profiles"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:fontFamily="@font/poppins_bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/profilesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:padding="8dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Navigation (fixed) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:background="@color/PrimaryPurple"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_nav_menu" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

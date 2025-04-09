@@ -2,6 +2,7 @@ package com.example.pixelpedia
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,21 +10,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.QueryDocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
     private lateinit var settingsIcon: ImageView
     private lateinit var auth: FirebaseAuth
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var gamerecyclerView: RecyclerView
+    private lateinit var profilerecyclerView: RecyclerView
     private lateinit var gameAdapter: GameAdapter
+    private lateinit var userProfileAdapter: UserProfileAdapter
     private lateinit var firestore: FirebaseFirestore
     private lateinit var userGreeting: TextView
     private val gameList = mutableListOf<Game>()
+    private val userList = mutableListOf<UserProfile>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,14 +40,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Initialize views
         settingsIcon = findViewById(R.id.setting)
-        recyclerView = findViewById(R.id.gameRecyclerView)
+        gamerecyclerView = findViewById(R.id.gameRecyclerView)
+        profilerecyclerView = findViewById(R.id.profilesRecyclerView)
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
         userGreeting = findViewById(R.id.userGreeting)
 
-        // Check if a user is logged in
         val user = auth.currentUser
         if (user != null) {
             val username = user.displayName ?: "User"
@@ -54,25 +55,32 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
         }
 
-        // Setup RecyclerView
+        // Game section setup
         gameAdapter = GameAdapter(gameList) { selectedGame ->
             val intent = Intent(this, IndividualGameActivity::class.java)
             intent.putExtra("gameId", selectedGame.gameId)
             startActivity(intent)
         }
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = gameAdapter
+        gamerecyclerView.layoutManager = LinearLayoutManager(this)
+        gamerecyclerView.adapter = gameAdapter
 
-        // Load games from Firestore
         loadGames()
 
-        // Redirect to settings
+        // Profile section setup
+        userProfileAdapter = UserProfileAdapter(userList) {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+        profilerecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        profilerecyclerView.adapter = userProfileAdapter
+
+        loadProfiles()
+
         settingsIcon.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
 
-        // Bottom Navigation
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -95,9 +103,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Reset the focus when returning from SearchActivity
         val searchBar: EditText = findViewById(R.id.searchBar)
-        searchBar.clearFocus() // Clear focus to ensure search bar is not focused
+        searchBar.clearFocus()
     }
 
     private fun loadGames() {
@@ -115,15 +122,40 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    private fun loadProfiles() {
+        firestore.collection("users").limit(10).get()
+            .addOnSuccessListener { documents ->
+                userList.clear()
+                for (document in documents) {
+                    val user = document.toUserProfile()
+                    userList.add(user)
+                    Log.d("UserProfile", "Fetched user: ${user.username}")  // Log each user
+                }
+                Log.d("UserProfile", "Total users fetched: ${userList.size}")  // Log total count
+                userProfileAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error loading profiles: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     private fun DocumentSnapshot.toGame(): Game {
         return Game(
-            gameId = this.id,
-            gamename = this.getString("gamename") ?: "Unknown Game",
-            gameimage = this.getString("gameimage") ?: "",
-            gameconsole = this.getString("gameconsole") ?: "Unknown Console",
-            gamegenre = this.getString("gamegenre") ?: "Unknown Genre",
-            gamedescription = this.getString("gamedescription") ?: "No Description Available"
+            gameId = id,
+            gamename = getString("gamename") ?: "Unknown Game",
+            gameimage = getString("gameimage") ?: "",
+            gameconsole = getString("gameconsole") ?: "Unknown Console",
+            gamegenre = getString("gamegenre") ?: "Unknown Genre",
+            gamedescription = getString("gamedescription") ?: "No Description Available"
+        )
+    }
+
+    private fun DocumentSnapshot.toUserProfile(): UserProfile {
+        return UserProfile(
+            userId = id,
+            username = getString("username") ?: "Unknown User",
+            profilePicUrl = getString("profilepic") ?: "",
+            likes = getLong("likes")?.toInt() ?: 0
         )
     }
 }
-
