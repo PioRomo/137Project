@@ -11,12 +11,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 
 class OtherProfilesActivity : AppCompatActivity() {
 
@@ -33,6 +34,10 @@ class OtherProfilesActivity : AppCompatActivity() {
     private lateinit var userId: String
     private val gameList = mutableListOf<Pair<String, String>>()
 
+    private lateinit var likeCountTextView: TextView
+    private lateinit var likeButton: ImageView
+    private var currentLikes: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_profiles)
@@ -45,12 +50,17 @@ class OtherProfilesActivity : AppCompatActivity() {
         libraryRecyclerView = findViewById(R.id.libraryRecyclerView)
         bottomNav = findViewById(R.id.bottomNav)
         leftChevron = findViewById(R.id.leftChevron)
+        likeCountTextView = findViewById(R.id.likesNumberText)
+        likeButton = findViewById(R.id.likesImage)
 
         // Get passed user ID or username
         userId = intent.getStringExtra("userId") ?: return
 
         // Fetch profile data
         fetchUserData()
+
+        // Fetch User Likes
+        fetchUserLikes()
 
         //Display User Library
         libraryRecyclerView = findViewById(R.id.libraryRecyclerView)
@@ -59,7 +69,65 @@ class OtherProfilesActivity : AppCompatActivity() {
         gameAdapter = GameAdapter()
         libraryRecyclerView.adapter = gameAdapter
 
+        // Fetch User's Library
         fetchUserGames()
+
+        val db = FirebaseFirestore.getInstance()
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val currentUserRef = db.collection("users").document(currentUserId)
+        val profileRef = db.collection("users").document(userId) // userId = the profile being viewed
+
+        // On load: check if the profile is already liked
+        currentUserRef.get().addOnSuccessListener { doc ->
+            val likedProfiles = doc.get("likedProfiles") as? List<*> ?: emptyList<String>()
+            val isLiked = likedProfiles.contains(userId)
+
+            // Set correct heart icon
+            likeButton.setImageResource(if (isLiked) R.drawable.pinkheart else R.drawable.heart)
+        }
+
+        // Set up the click listener
+        likeButton.setOnClickListener {
+            currentUserRef.get().addOnSuccessListener { doc ->
+                val likedProfiles = doc.get("likedProfiles") as? List<*> ?: emptyList<String>()
+                val isLiked = likedProfiles.contains(userId)
+
+                if (isLiked) {
+                    // If already liked, remove like
+                    profileRef.update("likes", FieldValue.increment(-1))
+                    currentUserRef.update("likedprofiles", FieldValue.arrayRemove(userId))
+                    currentLikes-= 1
+                    likeCountTextView.text = currentLikes.toString()
+                    likeButton.setImageResource(R.drawable.heart)
+
+                } else {
+                    profileRef.update("likes", FieldValue.increment(1))
+                    currentUserRef.update("likedprofiles", FieldValue.arrayUnion(userId))
+                    currentLikes += 1
+                    likeCountTextView.text = currentLikes.toString()
+                    likeButton.setImageResource(R.drawable.pinkheart)
+                }
+            }
+        }
+
+        // Set up the click listener for the like button
+        /*likeButton.setOnClickListener {
+            //Fetch current user and selected profile's user
+            val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            val currentUserRef = db.collection("users").document(currentUserId)
+            val profileRef = db.collection("users").document(userId)
+
+            val isLiked = (likeButton.drawable.constantState == ContextCompat.getDrawable(this, R.drawable.pinkheart)?.constantState)
+
+            val newLikes = if (isLiked) currentLikes - 1 else currentLikes + 1
+            updateLikes(newLikes)
+            likeCountTextView.text = newLikes.toString()
+            currentLikes = newLikes
+
+            val newImage = if (isLiked) R.drawable.heart else R.drawable.pinkheart
+            likeButton.setImageResource(newImage)
+        }*/
+
 
 
         // Back button logic
@@ -166,4 +234,39 @@ class OtherProfilesActivity : AppCompatActivity() {
 
         override fun getItemCount(): Int = gameList.size
     }
+
+    // Function to fetch the current likes count from Firestore
+    private fun fetchUserLikes() {
+        if (userId != null) {
+            val userRef = FirebaseFirestore.getInstance().collection("users").document(userId!!)
+            userRef.get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        // Get the current likes count from Firestore
+                        currentLikes = document.getLong("likes")?.toInt() ?: 0
+                        likeCountTextView.text = currentLikes.toString()  // Display the fetched likes count
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("OtherProfileActivity", "Error fetching likes", e)
+                }
+        }
+    }
+
+    // Function to update the likes count in Firestore
+    private fun updateLikes(newLikes: Int) {
+        if (userId != null) {
+            val userRef = FirebaseFirestore.getInstance().collection("users").document(userId!!)
+            userRef.update("likes", newLikes)
+                .addOnSuccessListener {
+                    Log.d("OtherProfileActivity", "Likes updated successfully")
+                    currentLikes = newLikes
+                }
+                .addOnFailureListener { e ->
+                    Log.e("OtherProfileActivity", "Error updating likes", e)
+                }
+        }
+    }
+
+
 }
