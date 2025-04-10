@@ -6,6 +6,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import android.content.Intent
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -25,17 +27,33 @@ class ProfileActivity : AppCompatActivity() {
         displayName = findViewById(R.id.profile_name)
         location = findViewById(R.id.profile_location)
 
-
         val user = auth.currentUser
         if (user != null) {
             displayName.text = user.displayName ?: "No name"
             email.text = user.email ?: "No email"
 
-            // Load profile photo with Glide
             Glide.with(this)
                 .load(user.photoUrl)
-                .placeholder(R.drawable.profile) // fallback image
+                .placeholder(R.drawable.profile)
                 .into(profilePic)
         }
+
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
+        bottomNav.selectedItemId = R.id.nav_profile
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
+                }
+                R.id.nav_library -> {
+                    startActivity(Intent(this, LibraryActivity::class.java))
+                    true
+                }
+                R.id.nav_profile -> true
+                else -> false
+            }
+        }
     }
+
 }
