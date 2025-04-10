@@ -67,10 +67,24 @@ class MainActivity : AppCompatActivity() {
         loadGames()
 
         // Profile section setup
-        userProfileAdapter = UserProfileAdapter(userList) {
+        /*userProfileAdapter = UserProfileAdapter(userList) {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
+        }*/
+        userProfileAdapter = UserProfileAdapter(userList) { selectedUser ->
+            val currentUser = auth.currentUser
+            val intent = if (selectedUser.userId == currentUser?.uid) {
+                // If it's the current user's profile, go to ProfileActivity
+                Intent(this, ProfileActivity::class.java)
+            } else {
+                // If it's another user's profile, go to OtherProfileActivity
+                Intent(this, OtherProfilesActivity::class.java).apply {
+                    putExtra("userId", selectedUser.userId)
+                }
+            }
+            startActivity(intent)
         }
+
         profilerecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         profilerecyclerView.adapter = userProfileAdapter
 

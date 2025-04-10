@@ -59,7 +59,6 @@ class ProfileActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-
         // Bottom Navigation
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNav.setOnItemSelectedListener { item ->
@@ -79,6 +78,7 @@ class ProfileActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
     }
 
     private fun showInputDialog() {
