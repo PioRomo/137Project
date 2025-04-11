@@ -79,7 +79,7 @@ class OtherProfilesActivity : AppCompatActivity() {
 
         // On load: check if the profile is already liked
         currentUserRef.get().addOnSuccessListener { doc ->
-            val likedProfiles = doc.get("likedProfiles") as? List<*> ?: emptyList<String>()
+            val likedProfiles = doc.get("likedprofiles") as? List<*> ?: emptyList<String>()
             val isLiked = likedProfiles.contains(userId)
 
             // Set correct heart icon
@@ -89,7 +89,7 @@ class OtherProfilesActivity : AppCompatActivity() {
         // Set up the click listener
         likeButton.setOnClickListener {
             currentUserRef.get().addOnSuccessListener { doc ->
-                val likedProfiles = doc.get("likedProfiles") as? List<*> ?: emptyList<String>()
+                val likedProfiles = doc.get("likedprofiles") as? List<*> ?: emptyList<String>()
                 val isLiked = likedProfiles.contains(userId)
 
                 if (isLiked) {
@@ -110,23 +110,7 @@ class OtherProfilesActivity : AppCompatActivity() {
             }
         }
 
-        // Set up the click listener for the like button
-        /*likeButton.setOnClickListener {
-            //Fetch current user and selected profile's user
-            val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
-            val currentUserRef = db.collection("users").document(currentUserId)
-            val profileRef = db.collection("users").document(userId)
 
-            val isLiked = (likeButton.drawable.constantState == ContextCompat.getDrawable(this, R.drawable.pinkheart)?.constantState)
-
-            val newLikes = if (isLiked) currentLikes - 1 else currentLikes + 1
-            updateLikes(newLikes)
-            likeCountTextView.text = newLikes.toString()
-            currentLikes = newLikes
-
-            val newImage = if (isLiked) R.drawable.heart else R.drawable.pinkheart
-            likeButton.setImageResource(newImage)
-        }*/
 
 
 
