@@ -148,4 +148,16 @@
         app:layout_constraintTop_toBottomOf="@+id/topBar"
         app:layout_constraintVertical_bias="0.71" />
 
+    <Switch
+        android:id="@+id/biometric_switch"
+        android:layout_width="312dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="284dp"
+        android:fontFamily="@font/poppins_bold"
+        android:text="Enable Biometric Login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.464"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBar" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
