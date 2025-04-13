@@ -36,7 +36,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var changeUsernameButton: Button
     private lateinit var leftChevron: ImageView
     private lateinit var locationButton: Button
-
+    private lateinit var biometricToggle: Switch
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +52,24 @@ class SettingsActivity : AppCompatActivity() {
         changeUsernameButton = findViewById(R.id.change_username)
         leftChevron = findViewById(R.id.leftChevron)
         locationButton = findViewById(R.id.change_location)
+        biometricToggle = findViewById(R.id.biometric_switch)
 
+        //Biometric Toggle function
+        loadBiometricStatus()
+        biometricToggle.setOnCheckedChangeListener(){ _, isChecked ->
+            val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+
+            if (isChecked) {
+                promptForPassword()
+            } else {
+                disableBiometricLogin()
+                loadBiometricStatus()
+            }
+
+            editor.putBoolean("biometric_enabled", isChecked) // Save the setting
+            editor.apply()
+        }
 
         //Set location function
         locationButton.setOnClickListener {
@@ -106,6 +123,111 @@ class SettingsActivity : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+    private fun loadBiometricStatus() {
+        val userId = auth.currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val biometricEnabled = document.getBoolean("biometric_enabled") ?: false
+                    biometricToggle.setOnCheckedChangeListener(null)
+                    biometricToggle.isChecked = biometricEnabled
+                    biometricToggle.setOnCheckedChangeListener { _, isChecked ->
+                        val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        if (isChecked) {
+                            promptForPassword()
+                        } else {
+                            disableBiometricLogin()
+                            loadBiometricStatus()
+                        }
+                        editor.putBoolean("biometric_enabled", isChecked)
+                        editor.apply()
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("BiometricStatus", "Failed to load biometric status: ${e.message}")
+            }
+    }
+
+    private fun promptForPassword(){
+        val dialog = AlertDialog.Builder(this)
+        val input = EditText(this)
+        input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        dialog.setView(input)
+        dialog.setTitle("Enter Password")
+
+        dialog.setPositiveButton("Submit") { _, _ ->
+            val enteredPassword = input.text.toString()
+            verifyPassword(enteredPassword)
+        }
+
+        dialog.setNegativeButton("Cancel") { _, _ ->
+            biometricToggle.isChecked = false // Disable the toggle if canceled
+        }
+
+        dialog.show()
+    }
+
+    private fun verifyPassword(password: String){
+        val user = auth.currentUser
+        if (user != null && user.email != null) {
+            val credential = EmailAuthProvider.getCredential(user.email!!, password)
+            user.reauthenticate(credential)
+                .addOnSuccessListener {
+                    enableBiometricLogin(user.uid)
+                    loadBiometricStatus()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show()
+                    biometricToggle.isChecked = false // Reset switch
+                }
+        }
+    }
+
+    private fun enableBiometricLogin(userId: String) {
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
+        db.collection("users").document(userId)
+            .update(mapOf(
+                "biometric_enabled" to true,
+                "biometric_device_id" to deviceId
+            ))
+            .addOnSuccessListener {
+                val sharedPreferences = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("biometric_login_enabled", true)  // Store the biometric enabled flag
+                editor.apply()
+                Toast.makeText(this, "Biometric login enabled!", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to enable biometric login", Toast.LENGTH_SHORT).show()
+                biometricToggle.isChecked = false
+            }
+    }
+
+    private fun disableBiometricLogin() {
+        val userId = auth.currentUser?.uid ?: return
+        db.collection("users").document(userId)
+            .update(mapOf(
+                "biometric_enabled" to false,   // Disable biometric login
+                "biometric_device_id" to ""     // Optionally reset the device ID if needed
+            ))
+            .addOnSuccessListener {
+                val sharedPreferences = getSharedPreferences("USER_PREFS", MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("biometric_login_enabled", false)
+                editor.apply()
+
+                Toast.makeText(this, "Biometric login disabled!", Toast.LENGTH_SHORT).show()
+                biometricToggle.isChecked = false  // Update toggle to reflect the disabled state
+                loadBiometricStatus()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to disable biometric login", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun confirmDeleteAccount() {

@@ -77,11 +77,13 @@ class RegisterActivity : AppCompatActivity() {
                         user?.sendEmailVerification()?.addOnCompleteListener { emailTask ->
                             if (emailTask.isSuccessful) {
                                 val userId = user.uid
+
                                 val userData = hashMapOf(
                                     "username" to username,
                                     "email" to email,
                                     "likes" to 0,
                                     "profilepic" to ""
+                                    "biometric_enabled" to false
 
                                 )
 
