@@ -77,7 +77,15 @@ class RegisterActivity : AppCompatActivity() {
                         user?.sendEmailVerification()?.addOnCompleteListener { emailTask ->
                             if (emailTask.isSuccessful) {
                                 val userId = user.uid
-                                val userData = hashMapOf("username" to username, "email" to email, "biometric_enabled" to false)
+
+                                val userData = hashMapOf(
+                                    "username" to username,
+                                    "email" to email,
+                                    "likes" to 0,
+                                    "profilepic" to ""
+                                    "biometric_enabled" to false
+
+                                )
 
                                 FirebaseFirestore.getInstance().collection("users").document(userId)
                                     .set(userData)

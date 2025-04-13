@@ -28,4 +28,7 @@
         <item>Nintendo Switch</item>
         <item>GameCube</item>
     </string-array>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_likes">LikesActivity</string>
+    <string name="title_activity_other_profiles">OtherProfilesActivity</string>
 </resources>
