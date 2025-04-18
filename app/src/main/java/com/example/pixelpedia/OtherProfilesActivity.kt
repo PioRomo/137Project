@@ -18,6 +18,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import org.json.JSONObject
+import java.io.IOException
 
 class OtherProfilesActivity : AppCompatActivity() {
 
@@ -106,12 +110,18 @@ class OtherProfilesActivity : AppCompatActivity() {
                     currentLikes += 1
                     likeCountTextView.text = currentLikes.toString()
                     likeButton.setImageResource(R.drawable.pinkheart)
+                    // 🔥 Send FCM Notification
+                    profileRef.get().addOnSuccessListener { targetUserDoc ->
+                        val fcmToken = targetUserDoc.getString("fcmToken")
+                        val currentUserName = doc.getString("username") ?: "Someone"
+
+                        if (!fcmToken.isNullOrEmpty()) {
+                            sendNotificationToUser(fcmToken, "$currentUserName liked your profile!")
+                        }
+                    }
                 }
             }
         }
-
-
-
 
 
         // Back button logic
@@ -251,6 +261,38 @@ class OtherProfilesActivity : AppCompatActivity() {
                 }
         }
     }
-
-
 }
+
+fun sendNotificationToUser(fcmToken: String, messageBody: String) {
+    val json = JSONObject()
+    val notification = JSONObject()
+
+    notification.put("title", "New Like!")
+    notification.put("body", messageBody)
+    json.put("to", fcmToken)
+    json.put("notification", notification)
+
+    val body = RequestBody.create(
+        "application/json; charset=utf-8".toMediaTypeOrNull(),
+        json.toString()
+    )
+
+    val request = Request.Builder()
+        .url("https://fcm.googleapis.com/fcm/send")
+        .addHeader("Authorization", "key=YOUR_SERVER_KEY_HERE")
+        .addHeader("Content-Type", "application/json")
+        .post(body)
+        .build()
+
+    val client = OkHttpClient()
+    client.newCall(request).enqueue(object : Callback {
+        override fun onFailure(call: Call, e: IOException) {
+            Log.e("FCM", "Notification failed: ${e.message}")
+        }
+
+        override fun onResponse(call: Call, response: Response) {
+            Log.d("FCM", "Notification sent: ${response.code}")
+        }
+    })
+}
+
