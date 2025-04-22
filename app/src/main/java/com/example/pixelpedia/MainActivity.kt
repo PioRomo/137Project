@@ -1,6 +1,8 @@
 package com.example.pixelpedia
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.Manifest
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
@@ -17,7 +19,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,10 +38,39 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userGreeting: TextView
     private val gameList = mutableListOf<Game>()
     private val userList = mutableListOf<UserProfile>()
+    val CHANNEL_ID = "ch1"
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ){
+        result:Boolean ->
+            if(result) {
+                showNotification()
+            }else{
+                Toast.makeText(
+                    this@MainActivity,
+                    "Permission Not Granted",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        createNotificationChannel()
+
+        if(ActivityCompat.checkSelfPermission(
+            applicationContext,
+                Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED
+            ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            return
+        }else {
+            showNotification()
+        }
 
         val searchBar: EditText = findViewById(R.id.searchBar)
 
@@ -180,18 +216,35 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+
+
+    @SuppressLint("MissingPermission")
+    private fun showNotification() {
+        var builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.red_minus_icon)
+            .setContentTitle("User Liked Your Profile")
+            .setContentText("A fellow user enjoys your profile!")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        with(NotificationManagerCompat.from(this)) {
+            // defined id is 1
+            notify(1, builder.build())
+        }
+    }
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Likes Notifications"
+            val name = "Likes Notification"
             val descriptionText = "Notifies when someone likes your profile"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel("likes_channel", name, importance).apply {
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
+
+            // register channel with our system
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
-
 }
