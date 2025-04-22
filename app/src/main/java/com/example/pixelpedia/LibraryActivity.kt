@@ -62,7 +62,7 @@ class LibraryActivity : AppCompatActivity() {
                 }
                 R.id.nav_library -> true
                 R.id.nav_profile -> {
-                    startActivity(Intent(this, MainActivity::class.java))
+                    startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
                 else -> false

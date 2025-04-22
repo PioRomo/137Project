@@ -117,7 +117,7 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                    startActivity(Intent(this, SettingsActivity::class.java))
+                    startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
                 else -> false

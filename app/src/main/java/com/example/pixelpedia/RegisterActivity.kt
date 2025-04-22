@@ -82,7 +82,7 @@ class RegisterActivity : AppCompatActivity() {
                                     "username" to username,
                                     "email" to email,
                                     "likes" to 0,
-                                    "profilepic" to ""
+                                    "profilepic" to "",
                                     "biometric_enabled" to false
 
                                 )

@@ -10,6 +10,7 @@ import android.util.Log
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +25,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var sortSpinner: Spinner
     private lateinit var genreSpinner: Spinner
     private lateinit var consoleSpinner: Spinner
+    private lateinit var leftChevron: ImageView
 
     private var allGames: MutableList<Game> = mutableListOf() // Full game list from Firestore
     private var filteredGames: MutableList<Game> = mutableListOf() // Search results
@@ -38,7 +40,12 @@ class SearchActivity : AppCompatActivity() {
         sortSpinner = findViewById(R.id.sortSpinner)
         genreSpinner = findViewById(R.id.genreSpinner)
         consoleSpinner = findViewById(R.id.consoleSpinner)
+        leftChevron = findViewById(R.id.leftChevron)
 
+        // Set up back navigation
+        leftChevron.setOnClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
+        }
         val sortAdapter = ArrayAdapter.createFromResource(
             this, R.array.sort_options, android.R.layout.simple_spinner_dropdown_item
         )
