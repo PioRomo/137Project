@@ -25,7 +25,13 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="0dp"
             android:layout_centerVertical="true"/>
-
+        <ImageView
+            android:id="@+id/leftChevron"
+            android:layout_width="59dp"
+            android:layout_height="53dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/baseline_chevron_left_24" />
     </RelativeLayout>
     <!-- Search Bar -->
     <EditText
