@@ -82,6 +82,11 @@
             android:textColor="@android:color/white"
             android:entries="@array/console_options"/>
     </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/profileRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
 
     <!-- RecyclerView to show game results -->
     <androidx.recyclerview.widget.RecyclerView
