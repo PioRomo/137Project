@@ -16,7 +16,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class LibraryActivity : AppCompatActivity() {
+class LibraryActivity : BaseActivity() {
     private lateinit var editIcon: ImageView
     private lateinit var recyclerView: RecyclerView
     private val gameList = mutableListOf<Pair<String, String>>() // Stores (gameId, imageUrl)

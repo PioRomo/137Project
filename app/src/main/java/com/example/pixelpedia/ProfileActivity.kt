@@ -18,7 +18,7 @@
     import de.hdodenhof.circleimageview.CircleImageView
 
 
-    class ProfileActivity : AppCompatActivity() {
+    class ProfileActivity : BaseActivity() {
 
         private lateinit var profileImageView: CircleImageView
         private lateinit var uploadProfilePicButton: Button
@@ -38,7 +38,7 @@
             setContentView(R.layout.activity_profile)
             enableEdgeToEdge()
 
-            profileImageView = findViewById(R.id.profile_image)
+            profileImageView = findViewById<CircleImageView>(R.id.profile_image)
             uploadProfilePicButton = findViewById(R.id.uploadProfilePictureButton)
             userName = findViewById(R.id.profile_name)
             userLocation = findViewById(R.id.profile_location)

@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 
-class OtherProfilesActivity : AppCompatActivity() {
+class OtherProfilesActivity : BaseActivity() {
 
     private lateinit var profilePicture: ImageView
     private lateinit var usernameText: TextView
