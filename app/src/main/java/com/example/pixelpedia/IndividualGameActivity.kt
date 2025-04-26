@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class IndividualGameActivity : AppCompatActivity() {
+class IndividualGameActivity : BaseActivity() {
     private lateinit var gameNameTextView: TextView
     private lateinit var gameGenreTextView: TextView
     private lateinit var gameConsoleTextView: TextView

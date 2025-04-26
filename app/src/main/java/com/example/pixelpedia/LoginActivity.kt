@@ -16,7 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.util.concurrent.Executor
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var emailEditText: EditText;

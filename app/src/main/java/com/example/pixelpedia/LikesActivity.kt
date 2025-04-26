@@ -22,7 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class LikesActivity : AppCompatActivity() {
+class LikesActivity : BaseActivity() {
 
     private lateinit var leftChevron: ImageView
     private lateinit var likedProfilesRecyclerView: RecyclerView

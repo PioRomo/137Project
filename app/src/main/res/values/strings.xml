@@ -31,4 +31,6 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_likes">LikesActivity</string>
     <string name="title_activity_other_profiles">OtherProfilesActivity</string>
+    <string name="profile_picture">Profile Picture</string>
+
 </resources>
