@@ -96,6 +96,7 @@ class OtherProfilesActivity : BaseActivity() {
                     // If already liked, remove like
                     profileRef.update("likes", FieldValue.increment(-1))
                     currentUserRef.update("likedprofiles", FieldValue.arrayRemove(userId))
+                    profileRef.update("likedBy", FieldValue.arrayRemove(currentUserId))
                     currentLikes-= 1
                     likeCountTextView.text = currentLikes.toString()
                     likeButton.setImageResource(R.drawable.heart)
@@ -103,6 +104,7 @@ class OtherProfilesActivity : BaseActivity() {
                 } else {
                     profileRef.update("likes", FieldValue.increment(1))
                     currentUserRef.update("likedprofiles", FieldValue.arrayUnion(userId))
+                    profileRef.update("likedBy", FieldValue.arrayUnion(currentUserId))
                     currentLikes += 1
                     likeCountTextView.text = currentLikes.toString()
                     likeButton.setImageResource(R.drawable.pinkheart)

@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import android.Manifest
 import android.location.Address
+import com.google.firebase.firestore.FieldValue
 import java.util.Locale
 
 class SettingsActivity : BaseActivity() {
@@ -297,17 +298,39 @@ class SettingsActivity : BaseActivity() {
 
     private fun showLocationDialog() {
         // Create an AlertDialog with two options
-        val options = arrayOf("Set current location", "Set location manually")
+        val options = arrayOf("Set current location", "Set location manually", "Delete Location")
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Choose Location Option")
         builder.setItems(options) { dialog, which ->
             when (which) {
                 0 -> fetchCurrentLocation() // Option 1: Get current location
                 1 -> showManualLocationDialog() // Option 2: Set manually
+                2 -> deleteLocation() // Option 3: Remove Location from Profile
             }
         }
         builder.show()
     }
+
+    private fun deleteLocation() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (userId != null) {
+            val db = FirebaseFirestore.getInstance()
+            val userRef = db.collection("users").document(userId)
+
+            // Use FieldValue.delete() to remove the location field
+            userRef.update("location", FieldValue.delete())
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Location deleted successfully", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Failed to delete location: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     private fun fetchCurrentLocation() {
         // Check for location permission

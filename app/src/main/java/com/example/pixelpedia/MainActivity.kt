@@ -7,7 +7,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -169,7 +168,7 @@ class MainActivity : BaseActivity() {
             userId = id,
             username = getString("username") ?: "Unknown User",
             profilePicUrl = getString("profilepic") ?: "",
-            likes = getLong("likes")?.toInt() ?: 0
+            likes = (getLong("likes")?: 0).toInt()
         )
     }
 }

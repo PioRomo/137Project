@@ -1,23 +1,13 @@
 package com.example.pixelpedia
 
-import androidx.appcompat.app.AppCompatActivity
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.MotionEvent
-import android.view.View
-import android.view.WindowInsets
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pixelpedia.databinding.ActivityLikesBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

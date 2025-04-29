@@ -126,11 +126,11 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/libraryRecyclerView"
-        android:layout_width="402dp"
-        android:layout_height="268dp"
+        android:layout_width="407dp"
+        android:layout_height="241dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNav"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.444"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/likesImage"
         app:layout_constraintVertical_bias="1.0"
