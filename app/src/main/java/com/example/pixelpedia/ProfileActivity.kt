@@ -1,14 +1,25 @@
     package com.example.pixelpedia
 
+    import android.annotation.SuppressLint
+    import android.content.Context
     import android.content.Intent
+    import android.content.pm.PackageManager
+    import android.os.Build
     import android.os.Bundle
     import android.util.Log
+    import android.Manifest
+    import android.app.NotificationChannel
+    import android.app.NotificationManager
     import android.widget.Button
     import android.widget.ImageView
     import android.widget.TextView
     import android.widget.Toast
     import androidx.activity.enableEdgeToEdge
+    import androidx.activity.result.contract.ActivityResultContracts
     import androidx.appcompat.app.AlertDialog
+    import androidx.core.app.ActivityCompat
+    import androidx.core.app.NotificationCompat
+    import androidx.core.app.NotificationManagerCompat
     import androidx.recyclerview.widget.LinearLayoutManager
     import androidx.recyclerview.widget.RecyclerView
     import com.bumptech.glide.Glide
@@ -41,6 +52,22 @@
         private val db = FirebaseFirestore.getInstance()
         private val userId = FirebaseAuth.getInstance().currentUser?.uid
 
+        companion object {
+            private const val LIKES_CHANNEL_ID = "likes_channel"
+            private const val LIKES_NOTIFICATION_ID = 2
+        }
+
+        private val notificationPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                showLikeNotification()
+            } else {
+                Toast.makeText(this, "Notification Permission Not Granted", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_profile)
@@ -58,6 +85,7 @@
             logo = findViewById(R.id.logo)
            // leftChevron = findViewById(R.id.leftChevron)      back button
 
+            createLikesNotificationChannel()
             loadUserProfile()
 
             fetchUsersWhoLikedMe { likedUsers ->
@@ -170,9 +198,12 @@
                         val username = doc.getString("username") ?: "Sample User"
                         val location = doc.getString("location") ?: "Bikini Bottom"
                         val numLikes = doc.getLong("likes") ?: 0L
+                        val currentLikes = doc.getLong("likes")?.toInt() ?: 0
                         userName.text = username
                         userLocation.text = location
                         profileLikes.text = "$numLikes"
+
+                        checkForNewLikes(currentLikes) // to trigger new notification
 
                         // Load profile image
                         val imageUrl = doc.getString("profilepic")
@@ -204,6 +235,61 @@
                 .setPositiveButton("OK", null)
                 .show()
         }
+
+        private fun createLikesNotificationChannel() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val name = "Likes Notification"
+                val descriptionText = "Notifies when your profile receives a new like"
+                val importance = NotificationManager.IMPORTANCE_HIGH
+                val channel = NotificationChannel(LIKES_CHANNEL_ID, name, importance).apply {
+                    description = descriptionText
+                }
+                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.createNotificationChannel(channel)
+            }
+        }
+
+        private fun checkForNewLikes(currentLikes: Int) {
+            val prefs = getSharedPreferences("prefs", Context.MODE_PRIVATE)
+            val previousLikes = prefs.getInt("lastKnownLikes", 0)
+
+            if (currentLikes > previousLikes) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ActivityCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        showLikeNotification()
+                    }
+                } else {
+                    showLikeNotification()
+                }
+
+                prefs.edit().putInt("lastKnownLikes", currentLikes).apply()
+            } else if (currentLikes != previousLikes) {
+                prefs.edit().putInt("lastKnownLikes", currentLikes).apply()
+            }
+        }
+
+        @SuppressLint("MissingPermission")
+        private fun showLikeNotification() {
+            val builder = NotificationCompat.Builder(this, LIKES_CHANNEL_ID)
+                .setSmallIcon(R.drawable.red_minus_icon)
+                .setContentTitle("You've got a new like!")
+                .setContentText("Someone liked your profile. Check it out!")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
+
+            with(NotificationManagerCompat.from(this)) {
+                notify(LIKES_NOTIFICATION_ID, builder.build())
+            }
+        }
+
+
 
         private fun fetchUsersWhoLikedMe(onComplete: (List<UserProfile>) -> Unit) {
             val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -240,7 +326,5 @@
                         }
                 }
         }
-
-
 
     }

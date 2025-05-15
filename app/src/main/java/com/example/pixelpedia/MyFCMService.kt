@@ -15,7 +15,7 @@ class MyFCMService : FirebaseMessagingService() {
     }
 
     private fun showNotification(title:String?, message:String?) {
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(applicationContext, CHANNELZ_ID)
             .setSmallIcon(R.drawable.red_minus_icon)
             .setContentTitle(title)
             .setContentText(message)

@@ -1,33 +1,34 @@
 package com.example.pixelpedia
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.google.firebase.messaging.FirebaseMessaging
 
-const val CHANNEL_ID = "channel_id"
-const val CHANNEL_ID2 = "channel_id2"
+const val CHANNELZ_ID = "channel_id"
+const val CHANNEL_ID4 = "channel_id4"
+private const val LIKES_CHANNEL_ID = "likes_channel"
+private const val LIKES_NOTIFICATION_ID = 2
 
 class MainActivity : BaseActivity() {
     private lateinit var settingsIcon: ImageView
@@ -45,60 +46,35 @@ class MainActivity : BaseActivity() {
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ){
-        result:Boolean ->
-            if(result) {
-                showNotification()
-            }else{
-                Toast.makeText(
-                    this@MainActivity,
-                    "Permission Not Granted",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+    ) { result: Boolean ->
+        if (result) {
+            showNotification()
+            checkForNewLikes()
+        } else {
+            Toast.makeText(this@MainActivity, "Permission Not Granted", Toast.LENGTH_SHORT).show()
+        }
     }
 
     lateinit var notificationManager: NotificationManager
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         createNotificationChannel()
 
-        if (checkSelfPermission(permissionArr[0]) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, permissionArr, 200)
-        }
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
-        notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel =
-                NotificationChannel(CHANNEL_ID, "General Notifications", NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-        }
-
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                return
-            } else {
-                showNotification()
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            // Devices lower than API 33 don't need this permission
             showNotification()
+            checkForNewLikes()
         }
-
 
         val searchBar: EditText = findViewById(R.id.searchBar)
-
         searchBar.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 val intent = Intent(this, SearchActivity::class.java)
@@ -106,13 +82,9 @@ class MainActivity : BaseActivity() {
             }
         }
 
-
-
         settingsIcon = findViewById(R.id.setting)
         gamerecyclerView = findViewById(R.id.gameRecyclerView)
         profilerecyclerView = findViewById(R.id.profilesRecyclerView)
-        auth = FirebaseAuth.getInstance()
-        firestore = FirebaseFirestore.getInstance()
         userGreeting = findViewById(R.id.userGreeting)
 
         val user = auth.currentUser
@@ -123,7 +95,6 @@ class MainActivity : BaseActivity() {
             Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
         }
 
-        // Game section setup
         gameAdapter = GameAdapter(gameList) { selectedGame ->
             val intent = Intent(this, IndividualGameActivity::class.java)
             intent.putExtra("gameId", selectedGame.gameId)
@@ -131,36 +102,25 @@ class MainActivity : BaseActivity() {
         }
         gamerecyclerView.layoutManager = LinearLayoutManager(this)
         gamerecyclerView.adapter = gameAdapter
-
         loadGames()
 
-        // Profile section setup
-        /*userProfileAdapter = UserProfileAdapter(userList) {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }*/
         userProfileAdapter = UserProfileAdapter(userList) { selectedUser ->
             val currentUser = auth.currentUser
             val intent = if (selectedUser.userId == currentUser?.uid) {
-                // If it's the current user's profile, go to ProfileActivity
                 Intent(this, ProfileActivity::class.java)
             } else {
-                // If it's another user's profile, go to OtherProfileActivity
                 Intent(this, OtherProfilesActivity::class.java).apply {
                     putExtra("userId", selectedUser.userId)
                 }
             }
             startActivity(intent)
         }
-
-        profilerecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        profilerecyclerView.layoutManager = LinearLayoutManager(this)
         profilerecyclerView.adapter = userProfileAdapter
-
         loadProfiles()
 
         settingsIcon.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
@@ -211,9 +171,9 @@ class MainActivity : BaseActivity() {
                 for (document in documents) {
                     val user = document.toUserProfile()
                     userList.add(user)
-                    Log.d("UserProfile", "Fetched user: ${user.username}")  // Log each user
+                    Log.d("UserProfile", "Fetched user: ${user.username}")
                 }
-                Log.d("UserProfile", "Total users fetched: ${userList.size}")  // Log total count
+                Log.d("UserProfile", "Total users fetched: ${userList.size}")
                 userProfileAdapter.notifyDataSetChanged()
             }
             .addOnFailureListener { e ->
@@ -237,40 +197,88 @@ class MainActivity : BaseActivity() {
             userId = id,
             username = getString("username") ?: "Unknown User",
             profilePicUrl = getString("profilepic") ?: "",
-            likes = (getLong("likes")?: 0).toInt()
+            likes = (getLong("likes") ?: 0).toInt()
         )
     }
 
-
-
     @SuppressLint("MissingPermission")
     private fun showNotification() {
-        var builder = NotificationCompat.Builder(this, CHANNEL_ID2)
+        val sharedPref = getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        val hasShownNotification = sharedPref.getBoolean("hasShownWelcomeNotification", false)
+        if (hasShownNotification) return
+
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID4)
             .setSmallIcon(R.drawable.red_minus_icon)
-            .setContentTitle("User Liked Your Profile")
-            .setContentText("A fellow user enjoys your profile!")
+            .setContentTitle("Welcome to PixelPedia!")
+            .setContentText("Please take a look around and add all your favorite games and customize your pfp!")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
 
         with(NotificationManagerCompat.from(this)) {
-            // defined id is 1
             notify(1, builder.build())
         }
+
+        sharedPref.edit().putBoolean("hasShownWelcomeNotification", true).apply()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun showLikeNotification() {
+        val builder = NotificationCompat.Builder(this, LIKES_CHANNEL_ID)
+            .setSmallIcon(R.drawable.red_minus_icon)
+            .setContentTitle("You've got a new like!")
+            .setContentText("Someone liked your profile. Check it out!")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setAutoCancel(true)
+
+        with(NotificationManagerCompat.from(this)) {
+            notify(LIKES_NOTIFICATION_ID, builder.build())
+        }
+    }
+
+    private fun checkForNewLikes() {
+        val currentUserId = auth.currentUser?.uid ?: return
+        firestore.collection("users").document(currentUserId).get()
+            .addOnSuccessListener { document ->
+                val currentLikes = document.getLong("likes")?.toInt() ?: 0
+                val prefs = getSharedPreferences("prefs", Context.MODE_PRIVATE)
+                val previousLikes = prefs.getInt("lastKnownLikes", 0)
+
+                if (currentLikes > previousLikes) {
+                    showLikeNotification()
+                    prefs.edit().putInt("lastKnownLikes", currentLikes).apply()
+                } else if (currentLikes != previousLikes) {
+                    prefs.edit().putInt("lastKnownLikes", currentLikes).apply()
+                }
+            }
+            .addOnFailureListener {
+                Log.e("MainActivity", "Failed to fetch user like count.")
+            }
     }
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Likes Notification"
-            val descriptionText = "Notifies when someone likes your profile"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID2, name, importance).apply {
-                description = descriptionText
+            val generalChannel = NotificationChannel(
+                CHANNELZ_ID, "General Notifications", NotificationManager.IMPORTANCE_HIGH
+            )
+
+            val welcomeChannel = NotificationChannel(
+                CHANNEL_ID4, "Welcome Notifications", NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "One-time welcome notification"
             }
 
-            // register channel with our system
-            val notificationManager: NotificationManager =
+            val likesChannel = NotificationChannel(
+                LIKES_CHANNEL_ID, "Likes Notification", NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifies when someone likes your profile"
+            }
+
+            val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(generalChannel)
+            notificationManager.createNotificationChannel(welcomeChannel)
+            notificationManager.createNotificationChannel(likesChannel)
         }
     }
 }
