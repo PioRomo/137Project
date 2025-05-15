@@ -1,6 +1,10 @@
 package com.example.pixelpedia
 
+import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,16 +12,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.Manifest
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
-import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
+
 
 class OtherProfilesActivity : BaseActivity() {
 
@@ -38,9 +49,31 @@ class OtherProfilesActivity : BaseActivity() {
     private lateinit var likeButton: ImageView
     private var currentLikes: Int = 0
 
+    // permission launcher
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ){
+            result:Boolean ->
+        if(result) {
+            sendNotificationToUser()
+        }else{
+            Toast.makeText(
+                this,
+                "Notification Permission Not Granted",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    companion object {
+        private const val CHANNEL_ID3 = "like_channel"
+        private const val NOTIFICATION_ID = 1
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_profiles)
+        createNotificationChannel()
 
         // UI references
         profilePicture = findViewById(R.id.profilePicture)
@@ -108,12 +141,27 @@ class OtherProfilesActivity : BaseActivity() {
                     currentLikes += 1
                     likeCountTextView.text = currentLikes.toString()
                     likeButton.setImageResource(R.drawable.pinkheart)
+
+                    // Check notification permission and send if granted
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (ActivityCompat.checkSelfPermission(
+                                this,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            sendNotificationToUser()
+                        }
+                    } else {
+                        sendNotificationToUser()
+                    }
+
+                    // checking if it worked
+                    Toast.makeText(this, "Nice Job, You liked this profile!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
-
-
-
 
 
         // Back button logic
@@ -254,5 +302,35 @@ class OtherProfilesActivity : BaseActivity() {
         }
     }
 
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Likes Notification Channel"
+            val descriptionText = "Channel for like notifications"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID3, name, importance).apply {
+                description = descriptionText
+            }
 
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun sendNotificationToUser() {
+        var builder = NotificationCompat.Builder(this, CHANNEL_ID3)
+            .setSmallIcon(R.drawable.red_minus_icon) // needs to be updated
+            .setContentTitle("Someone liked your profile!")
+            .setContentText("Check out your profile to see who liked you.")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+
+        with(NotificationManagerCompat.from(this)) {
+            // defined id is 1 here
+            notify(NOTIFICATION_ID, builder.build())
+        }
+    }
 }
+
