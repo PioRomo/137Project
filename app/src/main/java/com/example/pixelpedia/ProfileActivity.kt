@@ -32,6 +32,8 @@
         private lateinit var viewLikes: Button
         private lateinit var infoIcon: ImageView
         private lateinit var recycler: RecyclerView
+        private lateinit var settingIcon:  ImageView
+        private lateinit var logo: ImageView
         //  private lateinit var leftChevron: ImageView         back button
 
 
@@ -52,6 +54,8 @@
             viewLikes = findViewById(R.id.viewLikesButton)
             infoIcon = findViewById(R.id.infoIcon)
             recycler = findViewById(R.id.recycler_likes)
+            settingIcon =  findViewById(R.id.setting)
+            logo = findViewById(R.id.logo)
            // leftChevron = findViewById(R.id.leftChevron)      back button
 
             loadUserProfile()
@@ -80,6 +84,15 @@
 
             infoIcon.setOnClickListener {
                 showUploadInformation()
+            }
+
+            logo.setOnClickListener{
+                startActivity(Intent(this, MainActivity::class.java))
+            }
+
+            settingIcon.setOnClickListener {
+                val intent  = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
             }
 
            // leftChevron.setOnClickListener {                              back button stuff

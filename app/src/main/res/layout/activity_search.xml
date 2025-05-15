@@ -38,13 +38,14 @@
         android:id="@+id/searchEditText"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@drawable/search_bar_background"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/poppins_bold"
         android:hint="Search"
         android:paddingStart="15dp"
         android:paddingEnd="50dp"
-        android:background="@drawable/search_bar_background"
         android:textColor="@android:color/white"
-        android:textColorHint="@android:color/darker_gray"
-        android:drawablePadding="10dp" />
+        android:textColorHint="@android:color/darker_gray" />
 
     <!-- Sorting & Filters -->
     <LinearLayout
@@ -61,6 +62,7 @@
             android:layout_weight="1"
             android:background="@drawable/filter_background"
             android:textColor="@android:color/white"
+
             android:entries="@array/sort_options"/>
 
         <Spinner
