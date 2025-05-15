@@ -25,7 +25,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.google.firebase.messaging.FirebaseMessaging
 
+const val CHANNEL_ID = "channel_id"
+const val CHANNEL_ID2 = "channel_id2"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var settingsIcon: ImageView
@@ -38,7 +41,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userGreeting: TextView
     private val gameList = mutableListOf<Game>()
     private val userList = mutableListOf<UserProfile>()
-    val CHANNEL_ID = "ch1"
+
+    val permissionArr = arrayOf(Manifest.permission.POST_NOTIFICATIONS)
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -55,11 +59,27 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    lateinit var notificationManager: NotificationManager
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         createNotificationChannel()
+
+        if (checkSelfPermission(permissionArr[0]) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, permissionArr, 200)
+        }
+
+        notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel =
+                NotificationChannel(CHANNEL_ID, "General Notifications", NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(
@@ -226,11 +246,12 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun showNotification() {
-        var builder = NotificationCompat.Builder(this, CHANNEL_ID)
+        var builder = NotificationCompat.Builder(this, CHANNEL_ID2)
             .setSmallIcon(R.drawable.red_minus_icon)
             .setContentTitle("User Liked Your Profile")
             .setContentText("A fellow user enjoys your profile!")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
 
         with(NotificationManagerCompat.from(this)) {
             // defined id is 1
@@ -243,7 +264,7 @@ class MainActivity : AppCompatActivity() {
             val name = "Likes Notification"
             val descriptionText = "Notifies when someone likes your profile"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+            val channel = NotificationChannel(CHANNEL_ID2, name, importance).apply {
                 description = descriptionText
             }
 

@@ -66,7 +66,7 @@ class OtherProfilesActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val CHANNEL_ID = "like_channel"
+        private const val CHANNEL_ID3 = "like_channel"
         private const val NOTIFICATION_ID = 1
     }
 
@@ -305,7 +305,7 @@ class OtherProfilesActivity : AppCompatActivity() {
             val name = "Likes Notification Channel"
             val descriptionText = "Channel for like notifications"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+            val channel = NotificationChannel(CHANNEL_ID3, name, importance).apply {
                 description = descriptionText
             }
 
@@ -318,11 +318,12 @@ class OtherProfilesActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun sendNotificationToUser() {
-        var builder = NotificationCompat.Builder(this, CHANNEL_ID)
+        var builder = NotificationCompat.Builder(this, CHANNEL_ID3)
             .setSmallIcon(R.drawable.red_minus_icon) // needs to be updated
             .setContentTitle("Someone liked your profile!")
             .setContentText("Check out your profile to see who liked you.")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
 
         with(NotificationManagerCompat.from(this)) {
             // defined id is 1 here
