@@ -21,9 +21,11 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.messaging
 
 const val CHANNELZ_ID = "channel_id"
 const val CHANNEL_ID4 = "channel_id4"
@@ -246,10 +248,26 @@ class MainActivity : BaseActivity() {
 
                 if (currentLikes > previousLikes) {
                     showLikeNotification()
-                    prefs.edit().putInt("lastKnownLikes", currentLikes).apply()
-                } else if (currentLikes != previousLikes) {
-                    prefs.edit().putInt("lastKnownLikes", currentLikes).apply()
                 }
+
+                // Subscribe or unsubscribe from "popular" topic
+                if (currentLikes > 1) {
+                    Firebase.messaging.subscribeToTopic("popular")
+                        .addOnCompleteListener { task ->
+                            val msg = if (task.isSuccessful) "Subscribed to popular" else "Subscribe failed"
+                            // alert hidden below
+                            // Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                        }
+                } else {
+                    Firebase.messaging.unsubscribeFromTopic("popular")
+                        .addOnCompleteListener { task ->
+                            val msg = if (task.isSuccessful) "Unsubscribed from popular" else "Unsubscribe failed"
+                            // alert hidden
+                            // Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                        }
+                }
+
+                prefs.edit().putInt("lastKnownLikes", currentLikes).apply()
             }
             .addOnFailureListener {
                 Log.e("MainActivity", "Failed to fetch user like count.")

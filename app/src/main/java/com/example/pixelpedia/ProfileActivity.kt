@@ -27,9 +27,11 @@
     import com.bumptech.glide.request.RequestOptions
     import com.google.android.gms.tasks.Tasks
     import com.google.android.material.bottomnavigation.BottomNavigationView
+    import com.google.firebase.Firebase
     import com.google.firebase.auth.FirebaseAuth
     import com.google.firebase.firestore.DocumentSnapshot
     import com.google.firebase.firestore.FirebaseFirestore
+    import com.google.firebase.messaging.messaging
     import de.hdodenhof.circleimageview.CircleImageView
 
 
@@ -199,6 +201,24 @@
                         val location = doc.getString("location") ?: "Bikini Bottom"
                         val numLikes = doc.getLong("likes") ?: 0L
                         val currentLikes = doc.getLong("likes")?.toInt() ?: 0
+
+                        // Subscribe or unsubscribe based on like count
+                        if (currentLikes > 1) {
+                            Firebase.messaging.subscribeToTopic("popular")
+                                .addOnCompleteListener { task ->
+                                    val msg = if (task.isSuccessful) "Subscribed to popular" else "Subscribe failed"
+                                    // alert hidden
+                                    // Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                                }
+                        } else {
+                            Firebase.messaging.unsubscribeFromTopic("popular")
+                                .addOnCompleteListener { task ->
+                                    val msg = if (task.isSuccessful) "Unsubscribed from popular" else "Unsubscribe failed"
+                                    // alert hidden
+                                    // Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                                }
+                        }
+
                         userName.text = username
                         userLocation.text = location
                         profileLikes.text = "$numLikes"
